@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5f5ed">
+  <meta name="description" content="Weather Lizard, Time Until, and the Lizard Tools in one place.">
+  <title>Lizard Dashboard</title>
+  <link rel="icon" href="lizard.png" type="image/png">
+  <link rel="stylesheet" href="styles.css">
+  <script src="dashboard.js" type="module"></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="shell header-inner">
+      <a class="brand" href="./"><img src="lizard.png" width="35" height="35" alt=""> Lizard Dashboard</a>
+      <a class="header-link" href="#tools">Tools <span aria-hidden="true">↓</span></a>
+    </div>
+  </header>
+
+  <main class="shell">
+    <div class="intro">
+      <time id="today" class="eyebrow"></time>
+      <h1>Your day at a glance</h1>
+    </div>
+
+    <div class="widgets">
+      <section class="widget weather" aria-labelledby="weather-title">
+        <div class="widget-header">
+          <h2 id="weather-title">Weather Lizard</h2>
+          <a class="widget-link" href="https://www.davidbreyer.com/weather-lizard/">Full forecast <span aria-hidden="true">↗</span></a>
+        </div>
+        <div class="weather-now">
+          <div>
+            <p class="eyebrow weather-place" id="weather-place">Cincinnati, OH 45202</p>
+            <div class="weather-reading" id="weather-reading" hidden>
+              <strong id="weather-temperature"></strong>
+              <div><p id="weather-condition"></p><p class="reading-source" id="weather-source"></p></div>
+            </div>
+            <p class="weather-status" id="weather-status" role="status">Loading forecast…</p>
+          </div>
+          <div class="weather-actions">
+            <button type="button" id="weather-location">Use my location</button>
+            <button type="button" id="weather-refresh" hidden>Retry forecast</button>
+          </div>
+        </div>
+        <p class="weather-alerts" id="weather-alerts" hidden></p>
+        <ul class="dayparts" id="dayparts" aria-label="Daypart forecast">
+          <li><span>Morning</span><strong>—</strong><small></small></li>
+          <li><span>Afternoon</span><strong>—</strong><small></small></li>
+          <li><span>Evening</span><strong>—</strong><small></small></li>
+          <li><span>Overnight</span><strong>—</strong><small></small></li>
+        </ul>
+      </section>
+
+      <section class="widget countdown" aria-labelledby="countdown-title">
+        <div class="widget-header">
+          <h2 id="countdown-title">Time Until</h2>
+          <a class="widget-link" href="https://www.davidbreyer.com/timeuntil/">Open app <span aria-hidden="true">↗</span></a>
+        </div>
+        <div class="countdown-empty" id="countdown-empty">
+          <span class="clock-icon" aria-hidden="true"></span>
+          <h3 id="countdown-message">No countdowns saved here yet</h3>
+          <p id="countdown-help">Add or import a countdown in Time Until using this browser.</p>
+          <a href="https://www.davidbreyer.com/timeuntil/" class="countdown-action">Go to Time Until <span aria-hidden="true">↗</span></a>
+        </div>
+        <div class="countdown-event" id="countdown-event" hidden>
+          <p class="eyebrow countdown-mode" id="countdown-mode"></p>
+          <h3 id="event-name"></h3>
+          <time id="event-date"></time>
+          <dl class="countdown-units">
+            <div><dt>Days</dt><dd id="days"></dd></div>
+            <div><dt>Hours</dt><dd id="hours"></dd></div>
+            <div><dt>Minutes</dt><dd id="minutes"></dd></div>
+            <div><dt>Seconds</dt><dd id="seconds"></dd></div>
+          </dl>
+        </div>
+      </section>
+    </div>
+
+    <section class="tools" id="tools" aria-labelledby="tools-title">
+      <div class="tools-header">
+        <h2 id="tools-title">Lizard Tools</h2>
+        <a class="tool-directory" href="https://www.davidbreyer.com/tools/">View all tools <span aria-hidden="true">↗</span></a>
+      </div>
+      <div class="tool-links">
+        <a class="tool" href="https://www.davidbreyer.com/compare-lizard/">
+          <span class="tool-icon" aria-hidden="true">±</span>
+          <span><strong>Compare Lizard</strong><small>Compare JSON and XML side by side.</small></span>
+          <span class="tool-arrow" aria-hidden="true">↗</span>
+        </a>
+        <a class="tool" href="https://www.davidbreyer.com/format-lizard/">
+          <span class="tool-icon" aria-hidden="true">{ }</span>
+          <span><strong>Format Lizard</strong><small>Format JSON, XML, YAML, and CSS.</small></span>
+          <span class="tool-arrow" aria-hidden="true">↗</span>
+        </a>
+        <a class="tool" href="https://www.davidbreyer.com/mock-lizard/">
+          <span class="tool-icon" aria-hidden="true">~</span>
+          <span><strong>Mock Lizard</strong><small>Generate mock API data from JSON.</small></span>
+          <span class="tool-arrow" aria-hidden="true">↗</span>
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="shell site-footer">
+    <a href="https://www.davidbreyer.com/">David Breyer</a>
+    <a href="https://www.weather.gov/">Weather data from the National Weather Service</a>
+  </footer>
+</body>
+</html>
