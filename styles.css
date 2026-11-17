@@ -104,6 +104,17 @@ h1 { font-size: clamp(54px, 8.1vw, 108px); line-height: .93; }
 .countdown-units div { display: flex; flex-direction: column-reverse; align-items: center; justify-content: center; padding: 8px 3px; background: #ffffff10; border-radius: 11px; }
 .countdown-units dd { font-size: clamp(20px, 3vw, 37px); font-weight: 600; font-variant-numeric: tabular-nums; letter-spacing: -.055em; overflow-wrap: anywhere; }
 .countdown-units dt { font-size: 11px; color: #e1e6d8; }
+.quiz { margin-top: 18px; background: #f3eff5; border: 1px solid #ded6e3; }
+.quiz .widget-header { border-color: #ded6e3; }
+.quiz-summary { display: flex; justify-content: space-between; align-items: center; gap: 20px; padding: 19px 23px 23px; }
+.quiz-recent { min-width: 0; }
+.quiz-recent .eyebrow { color: #5e5265; margin-bottom: 4px; }
+.quiz-name { font-family: var(--serif); font-size: clamp(26px, 3vw, 38px); line-height: 1.05; overflow-wrap: anywhere; }
+.quiz-detail { margin-top: 5px; font-size: 13px; color: #5e5265; }
+.quiz-metrics { display: flex; gap: 9px; flex: 0 0 auto; }
+.quiz-metrics div { display: flex; flex-direction: column-reverse; min-width: 134px; padding: 8px 12px; border-radius: 11px; background: #eae2ee; }
+.quiz-metrics dd { font-size: 27px; font-weight: 600; font-variant-numeric: tabular-nums; letter-spacing: -.04em; }
+.quiz-metrics dt { color: #5e5265; font-size: 11px; font-weight: 600; }
 .tools { margin-block: 38px 35px; }
 .tools-header { margin-bottom: 14px; }
 .tools h2 { font-size: clamp(38px, 4vw, 52px); line-height: 1; }
@@ -137,6 +148,8 @@ h1 { font-size: clamp(54px, 8.1vw, 108px); line-height: .93; }
   .widget-header, .weather-now, .countdown-empty, .countdown-event { padding-inline: 15px; }
   .weather-now { flex-direction: column; min-height: 0; }
   .weather-actions { display: flex; flex-wrap: wrap; }
+  .quiz-summary { flex-direction: column; align-items: stretch; gap: 14px; padding: 17px 15px; }
+  .quiz-metrics div { flex: 1; min-width: 0; }
   .dayparts li, .dayparts li:first-child { padding-inline: 8px; }
   .dayparts li:first-child { padding-left: 12px; }
   .site-footer { align-items: flex-start; flex-direction: column; gap: 8px; }

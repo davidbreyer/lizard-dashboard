@@ -1,7 +1,10 @@
 const byId = (id) => document.getElementById(id);
 const countdownKey = 'timeuntil.events.v1';
+const quizKey = 'quiz-your-lizard:v1';
 const dashboardDate = new Intl.DateTimeFormat(undefined, { weekday: 'long', month: 'long', day: 'numeric' });
 const eventDate = new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' });
+const practiceDate = new Intl.DateTimeFormat(undefined, { dateStyle: 'medium' });
+const libraryCount = new Intl.NumberFormat();
 const units = ['days', 'hours', 'minutes', 'seconds'];
 const unitNodes = units.map(byId);
 let selectedEvent;
@@ -55,6 +58,46 @@ function tick() {
     const value = String(values[index]).padStart(2, '0');
     if (node.textContent !== value) node.textContent = value;
   });
+}
+
+function latestPractice(history) {
+  let latest;
+  for (const result of history) {
+    if (typeof result?.quizName !== 'string' || !result.quizName.trim() || typeof result.date !== 'string' ||
+      !['quiz', 'spelling'].includes(result.mode) || !Number.isFinite(result.total) || result.total <= 0 ||
+      !Number.isFinite(result.first) || result.first < 0 || result.first > result.total) continue;
+    const timestamp = Date.parse(result.date);
+    if (Number.isFinite(timestamp) && (!latest || timestamp > latest.timestamp)) latest = { ...result, timestamp };
+  }
+  return latest;
+}
+
+function readQuizSummary() {
+  let state;
+  let message = 'No saved practice in this browser yet';
+  try {
+    const raw = localStorage.getItem(quizKey);
+    if (raw !== null) {
+      const saved = JSON.parse(raw);
+      if (saved?.version !== 1 || !Array.isArray(saved.quizzes)) throw new Error('Unsupported quiz data.');
+      state = saved;
+      message = 'No practice sessions yet';
+    }
+  } catch {
+    message = 'Saved quiz data unavailable';
+  }
+
+  const result = Array.isArray(state?.history) ? latestPractice(state.history) : undefined;
+  byId('quiz-session').textContent = result?.quizName || message;
+  byId('quiz-session-detail').hidden = !result;
+  byId('quiz-score-metric').hidden = !result;
+  byId('quiz-metrics').hidden = !state;
+  if (state) byId('quiz-count').textContent = libraryCount.format(state.quizzes.length);
+  if (result) {
+    const mode = result.mode === 'spelling' ? 'Spelling' : 'Pop quiz';
+    byId('quiz-session-detail').textContent = `${mode} · ${practiceDate.format(result.timestamp)}`;
+    byId('quiz-score').textContent = `${Math.round(result.first / result.total * 100)}%`;
+  }
 }
 
 const defaultLocation = { latitude: 39.1031, longitude: -84.5120, label: 'Cincinnati, OH 45202' };
@@ -184,9 +227,11 @@ function refreshWeatherIfStale() {
 
 window.addEventListener('storage', ({ key }) => {
   if (key === countdownKey || key === null) readCountdown();
+  if (key === quizKey || key === null) readQuizSummary();
 });
 window.addEventListener('pageshow', () => {
   readCountdown();
+  readQuizSummary();
   refreshWeatherIfStale();
 });
 document.addEventListener('visibilitychange', refreshWeatherIfStale);
@@ -194,6 +239,7 @@ locationButton.addEventListener('click', () => updateWeather(true));
 retryButton.addEventListener('click', () => updateWeather());
 
 readCountdown();
+readQuizSummary();
 updateWeather();
 setInterval(tick, 1000);
 setInterval(refreshWeatherIfStale, 15 * 60000);

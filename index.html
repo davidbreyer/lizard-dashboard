@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#f5f5ed">
-  <meta name="description" content="Weather Lizard, Time Until, and the Lizard Tools in one place.">
+  <meta name="description" content="Weather Lizard, Time Until, Quiz Your Lizard, and the Lizard Tools in one place.">
   <meta name="app-version" content="development">
   <title>Lizard Dashboard</title>
   <link rel="icon" href="lizard.png?v=development" type="image/png">
@@ -78,6 +78,30 @@
         </div>
       </section>
     </div>
+
+    <section class="widget quiz" aria-labelledby="quiz-title">
+      <div class="widget-header">
+        <h2 id="quiz-title">Quiz Your Lizard</h2>
+        <a class="widget-link" href="https://www.davidbreyer.com/quiz-your-lizard/">Open quiz library <span aria-hidden="true">↗</span></a>
+      </div>
+      <div class="quiz-summary">
+        <div class="quiz-recent">
+          <p class="eyebrow">Latest practice</p>
+          <p class="quiz-name" id="quiz-session">No saved practice in this browser yet</p>
+          <p class="quiz-detail" id="quiz-session-detail" hidden></p>
+        </div>
+        <dl class="quiz-metrics" id="quiz-metrics" hidden>
+          <div id="quiz-score-metric" hidden>
+            <dt>First-attempt score</dt>
+            <dd id="quiz-score"></dd>
+          </div>
+          <div>
+            <dt>Quizzes in your library</dt>
+            <dd id="quiz-count"></dd>
+          </div>
+        </dl>
+      </div>
+    </section>
 
     <section class="tools" id="tools" aria-labelledby="tools-title">
       <div class="tools-header">
