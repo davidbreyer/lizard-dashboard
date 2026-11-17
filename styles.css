@@ -32,6 +32,8 @@ button { font: inherit; color: inherit; }
 .header-inner { min-height: 70px; }
 .brand, .header-link, .widget-link, .tool-directory, .tool, .countdown-action { text-decoration: none; }
 .brand { display: inline-flex; align-items: center; gap: 10px; font-size: 15px; font-weight: 700; }
+.brand img { flex-shrink: 0; }
+.header-actions { display: flex; align-items: center; gap: 12px; white-space: nowrap; }
 .header-link { display: inline-flex; align-items: center; gap: 8px; padding-block: 10px; font-size: 14px; font-weight: 700; }
 .header-link:hover, .widget-link:hover, .countdown-action:hover { text-decoration: underline; }
 .intro { padding-block: clamp(44px, 6vw, 80px) clamp(24px, 4vw, 48px); }
@@ -39,8 +41,20 @@ button { font: inherit; color: inherit; }
 h1, .tools h2 { font-family: var(--serif); font-weight: 400; letter-spacing: -.035em; }
 h1 { font-size: clamp(54px, 8.1vw, 108px); line-height: .93; }
 .dashboard-date { padding-block: clamp(23px, 3vw, 38px) clamp(16px, 2vw, 23px); font-size: clamp(32px, 4.5vw, 56px); line-height: 1.05; text-wrap: balance; }
+.cards-button { border: 1px solid #c4cfb9; background: #fcfdf7; border-radius: 100px; padding: 8px 13px; font-size: 13px; font-weight: 700; cursor: pointer; }
+.cards-button:hover { background: #edf2e3; }
+.card-settings { width: min(350px, calc(100% - 32px)); max-height: calc(100% - 32px); padding: 22px; border: 1px solid var(--line); border-radius: 18px; color: var(--ink); background: #fcfdf7; }
+.card-settings::backdrop { background: #1f2b2166; }
+.card-settings h2 { font-family: var(--serif); font-size: 34px; line-height: 1; font-weight: 400; }
+.card-choices { margin-block: 14px; }
+.card-choices label { display: flex; align-items: center; gap: 10px; min-height: 40px; font-size: 15px; cursor: pointer; }
+.card-choices input { margin: 0; width: 17px; height: 17px; accent-color: var(--pine); }
+.card-settings-status:not(:empty) { margin-bottom: 10px; color: #863822; font-size: 13px; }
+.card-settings-done { display: block; margin-left: auto; background: var(--leaf); }
+.cards-empty { color: var(--muted); font-size: 14px; }
 .widgets { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 18px; }
 .widget { min-width: 0; border-radius: 22px; overflow: hidden; }
+.widget-wide { grid-column: 1 / -1; }
 .widget-header { min-height: 64px; padding: 13px 23px; border-bottom: 1px solid var(--line); }
 .widget-header h2 { font-size: 17px; letter-spacing: -.035em; }
 .widget-link { font-size: 13px; font-weight: 700; white-space: nowrap; }
@@ -104,7 +118,6 @@ h1 { font-size: clamp(54px, 8.1vw, 108px); line-height: .93; }
 .countdown-units div { display: flex; flex-direction: column-reverse; align-items: center; justify-content: center; padding: 8px 3px; background: #ffffff10; border-radius: 11px; }
 .countdown-units dd { font-size: clamp(20px, 3vw, 37px); font-weight: 600; font-variant-numeric: tabular-nums; letter-spacing: -.055em; overflow-wrap: anywhere; }
 .countdown-units dt { font-size: 11px; color: #e1e6d8; }
-.activity-widgets { margin-top: 18px; }
 .todo { background: #fbf5e9; border: 1px solid #e7dbc7; }
 .todo .widget-header { border-color: #e7dbc7; flex-wrap: wrap; gap: 6px 10px; }
 .todo-actions, .todo-add-row { display: flex; align-items: center; gap: 8px; }
@@ -175,7 +188,10 @@ h1 { font-size: clamp(54px, 8.1vw, 108px); line-height: .93; }
 
 @media (max-width: 480px) {
   .shell { width: calc(100% - 28px); }
-  .header-inner { min-height: 60px; }
+  .header-inner { min-height: 60px; gap: 8px; }
+  .header-actions { gap: 8px; }
+  .header-actions .header-link { gap: 4px; }
+  .header-actions .cards-button { padding-inline: 10px; }
   .intro { padding-top: 36px; }
   .widget-header, .weather-now, .countdown-empty, .countdown-event, .todo-summary { padding-inline: 15px; }
   .weather-now { flex-direction: column; min-height: 0; }

@@ -2,6 +2,10 @@ const byId = (id) => document.getElementById(id);
 const countdownKey = 'timeuntil.events.v1';
 const quizKey = 'quiz-your-lizard:v1';
 const todoKey = 'todo-lizard:v1';
+const hiddenCardsKey = 'lizard-dashboard.hidden-cards.v1';
+const cardSettings = byId('card-settings');
+const cardChoices = [...cardSettings.querySelectorAll('input[type="checkbox"]')];
+const weatherCard = byId('weather-card');
 const dashboardDate = new Intl.DateTimeFormat(undefined, { weekday: 'long', month: 'long', day: 'numeric' });
 const eventDate = new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' });
 const practiceDate = new Intl.DateTimeFormat(undefined, { dateStyle: 'medium' });
@@ -335,7 +339,7 @@ function locateUser() {
 }
 
 async function updateWeather(mode = 'refresh') {
-  if (weatherBusy) return;
+  if (weatherBusy || weatherCard.hidden) return;
   weatherBusy = locationButton.disabled = defaultButton.disabled = retryButton.disabled = true;
   const status = byId('weather-status');
   retryButton.hidden = true;
@@ -386,7 +390,33 @@ function refreshWeatherIfStale() {
   if (!document.hidden && weatherLoadedAt && Date.now() - weatherLoadedAt >= 15 * 60000) updateWeather();
 }
 
+function applyCardVisibility() {
+  const weatherWasHidden = weatherCard.hidden;
+  const visible = cardChoices.filter((choice) => choice.checked);
+  const wideCard = visible.length % 2 === 1 ? visible.at(-1) : null;
+  for (const choice of cardChoices) {
+    const card = byId(choice.value);
+    card.hidden = !choice.checked;
+    card.classList.toggle('widget-wide', choice === wideCard);
+  }
+  byId('cards-empty').hidden = visible.length > 0;
+  if (weatherWasHidden && !weatherCard.hidden) updateWeather();
+}
+
+function readCardVisibility() {
+  let saved;
+  try {
+    saved = JSON.parse(localStorage.getItem(hiddenCardsKey) ?? '[]');
+  } catch {
+    saved = [];
+  }
+  const hidden = Array.isArray(saved) ? saved : [];
+  for (const choice of cardChoices) choice.checked = !hidden.includes(choice.value);
+  applyCardVisibility();
+}
+
 window.addEventListener('storage', ({ key }) => {
+  if (key === hiddenCardsKey || key === null) readCardVisibility();
   if (key === countdownKey || key === null) readCountdown();
   if (key === quizKey || key === null) readQuizSummary();
   if (key === todoKey || key === null) readTodoSummary();
@@ -398,6 +428,18 @@ window.addEventListener('pageshow', () => {
   refreshWeatherIfStale();
 });
 document.addEventListener('visibilitychange', refreshWeatherIfStale);
+byId('cards-button').addEventListener('click', () => cardSettings.showModal());
+cardSettings.addEventListener('change', () => {
+  applyCardVisibility();
+  const status = byId('card-settings-status');
+  try {
+    const hidden = cardChoices.filter((choice) => !choice.checked).map((choice) => choice.value);
+    localStorage.setItem(hiddenCardsKey, JSON.stringify(hidden));
+    status.textContent = '';
+  } catch {
+    status.textContent = 'Could not save your card choices in this browser.';
+  }
+});
 todoAddToggle.addEventListener('click', () => setTodoAddOpen(todoAddForm.hidden));
 byId('todo-add-cancel').addEventListener('click', () => setTodoAddOpen(false));
 todoAddForm.addEventListener('submit', addTodoTask);
@@ -411,6 +453,7 @@ locationButton.addEventListener('click', () => updateWeather('locate'));
 defaultButton.addEventListener('click', () => updateWeather('default'));
 retryButton.addEventListener('click', () => updateWeather());
 
+readCardVisibility();
 readCountdown();
 readQuizSummary();
 updateWeather();
