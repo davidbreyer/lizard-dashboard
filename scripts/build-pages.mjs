@@ -13,13 +13,16 @@ const { year, month, day, hour, minute } = Object.fromEntries(
 const version = `${year}${month}${day}-${hour}${minute}`;
 const root = new URL('../', import.meta.url);
 const output = new URL('dist/', root);
-const source = readFileSync(new URL('index.html', root), 'utf8');
-const markers = /\bdevelopment\b/g;
-if ([...source.matchAll(markers)].length !== 6) throw new Error('Expected version markers in the footer, metadata, and asset URLs.');
+const markers = /(name="app-version" content="|id="app-version">|\?v=)development\b/g;
 
 mkdirSync(output, { recursive: true });
 for (const file of ['.nojekyll', 'dashboard.js', 'lizard.png', 'styles.css']) {
   copyFileSync(new URL(file, root), new URL(file, output));
 }
-writeFileSync(new URL('index.html', output), source.replace(markers, version));
+for (const file of ['index.html', 'tools/index.html']) {
+  const source = readFileSync(new URL(file, root), 'utf8');
+  const destination = new URL(file, output);
+  mkdirSync(new URL('.', destination), { recursive: true });
+  writeFileSync(destination, source.replace(markers, (_, prefix) => prefix + version));
+}
 console.log(`Version: ${version}`);
