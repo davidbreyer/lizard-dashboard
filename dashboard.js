@@ -166,6 +166,8 @@ function readQuizSummary() {
 }
 
 const defaultLocation = { latitude: 39.1031, longitude: -84.5120, label: 'Cincinnati, OH 45202' };
+// Shared with Weather Lizard on the same origin.
+const weatherLocationKey = 'weather-lizard.location.v1';
 const timeWindows = [
   { start: 6, end: 12, midpoint: 9 },
   { start: 12, end: 18, midpoint: 15 },
@@ -175,10 +177,36 @@ const timeWindows = [
 const daypartNodes = [...document.querySelectorAll('#dayparts li')].map((item) =>
   ({ temperature: item.querySelector('strong'), condition: item.querySelector('small') }));
 const locationButton = byId('weather-location');
+const defaultButton = byId('weather-default');
 const retryButton = byId('weather-refresh');
-let activeLocation = defaultLocation;
+let activeLocation = readWeatherLocation() ?? defaultLocation;
 let weatherLoadedAt = 0;
 let weatherBusy = false;
+
+function approximateWeatherLocation(coords) {
+  const { latitude, longitude } = coords ?? {};
+  if (!Number.isFinite(latitude) || Math.abs(latitude) > 90 ||
+      !Number.isFinite(longitude) || Math.abs(longitude) > 180) return null;
+  return { latitude: Number(latitude.toFixed(3)), longitude: Number(longitude.toFixed(3)) };
+}
+
+function readWeatherLocation() {
+  try {
+    return approximateWeatherLocation(JSON.parse(localStorage.getItem(weatherLocationKey)));
+  } catch {
+    return null;
+  }
+}
+
+function saveWeatherLocation(location) {
+  try {
+    if (location) localStorage.setItem(weatherLocationKey, JSON.stringify(location));
+    else localStorage.removeItem(weatherLocationKey);
+    return true;
+  } catch {
+    return false;
+  }
+}
 
 async function requestWeather(url) {
   const response = await fetch(url, { headers: { Accept: 'application/geo+json' }, signal: AbortSignal.timeout(10000) });
@@ -250,16 +278,26 @@ function locateUser() {
   ));
 }
 
-async function updateWeather(useLocation = false) {
+async function updateWeather(mode = 'refresh') {
   if (weatherBusy) return;
-  weatherBusy = locationButton.disabled = retryButton.disabled = true;
+  weatherBusy = locationButton.disabled = defaultButton.disabled = retryButton.disabled = true;
   const status = byId('weather-status');
   retryButton.hidden = true;
-  status.textContent = useLocation ? 'Finding your location…' : 'Loading forecast…';
+  let locating = mode === 'locate';
+  let preferenceSaved = true;
+  if (mode === 'default') {
+    activeLocation = defaultLocation;
+    preferenceSaved = saveWeatherLocation(null);
+  }
   let location = activeLocation;
-  let locating = useLocation;
+  if (!weatherLoadedAt) byId('weather-place').textContent = location.label || 'Saved location';
+  status.textContent = locating ? 'Finding your location…' : 'Loading forecast…';
   try {
-    if (useLocation) location = await locateUser();
+    if (locating) {
+      location = approximateWeatherLocation(await locateUser());
+      if (!location) throw new Error('Invalid location.');
+      status.textContent = 'Loading forecast…';
+    }
     locating = false;
     const point = `${location.latitude.toFixed(4)},${location.longitude.toFixed(4)}`;
     const { properties } = await requestWeather(`https://api.weather.gov/points/${point}`);
@@ -276,13 +314,15 @@ async function updateWeather(useLocation = false) {
     renderWeather(properties, periods, location.label || placeName(properties), observation, alerts);
     activeLocation = location;
     weatherLoadedAt = Date.now();
-    status.textContent = '';
+    if (mode === 'locate') preferenceSaved = saveWeatherLocation(location);
+    status.textContent = preferenceSaved ? '' : 'Could not save the location change in this browser.';
   } catch {
     const error = locating ? 'Could not use your location.' : 'Could not load the forecast.';
     status.textContent = weatherLoadedAt ? `${error} Showing the last forecast.` : error;
     retryButton.hidden = locating && Boolean(weatherLoadedAt);
   } finally {
-    weatherBusy = locationButton.disabled = retryButton.disabled = false;
+    defaultButton.hidden = activeLocation === defaultLocation;
+    weatherBusy = locationButton.disabled = defaultButton.disabled = retryButton.disabled = false;
   }
 }
 
@@ -302,7 +342,8 @@ window.addEventListener('pageshow', () => {
   refreshWeatherIfStale();
 });
 document.addEventListener('visibilitychange', refreshWeatherIfStale);
-locationButton.addEventListener('click', () => updateWeather(true));
+locationButton.addEventListener('click', () => updateWeather('locate'));
+defaultButton.addEventListener('click', () => updateWeather('default'));
 retryButton.addEventListener('click', () => updateWeather());
 
 readCountdown();
