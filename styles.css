@@ -104,9 +104,20 @@ h1 { font-size: clamp(54px, 8.1vw, 108px); line-height: .93; }
 .countdown-units div { display: flex; flex-direction: column-reverse; align-items: center; justify-content: center; padding: 8px 3px; background: #ffffff10; border-radius: 11px; }
 .countdown-units dd { font-size: clamp(20px, 3vw, 37px); font-weight: 600; font-variant-numeric: tabular-nums; letter-spacing: -.055em; overflow-wrap: anywhere; }
 .countdown-units dt { font-size: 11px; color: #e1e6d8; }
-.quiz { margin-top: 18px; background: #f3eff5; border: 1px solid #ded6e3; }
+.activity-widgets { margin-top: 18px; }
+.todo { background: #fbf5e9; border: 1px solid #e7dbc7; }
+.todo .widget-header { border-color: #e7dbc7; }
+.todo-summary { padding: 17px 23px 22px; }
+.todo-status { color: #63503a; font-size: 13px; font-weight: 700; }
+.todo-list { margin: 9px 0 0; padding: 0; list-style: none; }
+.todo-list li { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; padding: 10px 0; border-top: 1px solid #e7dbc7; }
+.todo-list li:last-child { padding-bottom: 0; }
+.todo-task-name { flex: 1 1 180px; min-width: 0; font-size: 15px; font-weight: 600; overflow-wrap: anywhere; }
+.todo-task-details { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 9px; color: #63503a; font-size: 12px; }
+.todo-task-priority, .todo-task-due.is-overdue { color: #863822; font-weight: 700; }
+.quiz { background: #f3eff5; border: 1px solid #ded6e3; }
 .quiz .widget-header { border-color: #ded6e3; }
-.quiz-summary { display: flex; justify-content: space-between; align-items: center; gap: 20px; padding: 19px 23px 23px; }
+.quiz-summary { display: flex; flex-direction: column; gap: 14px; padding: 19px 23px 23px; }
 .quiz-recent { min-width: 0; }
 .quiz-recent .eyebrow { color: #5e5265; margin-bottom: 4px; }
 .quiz-name { font-family: var(--serif); font-size: clamp(26px, 3vw, 38px); line-height: 1.05; overflow-wrap: anywhere; }
@@ -155,10 +166,10 @@ h1 { font-size: clamp(54px, 8.1vw, 108px); line-height: .93; }
   .shell { width: calc(100% - 28px); }
   .header-inner { min-height: 60px; }
   .intro { padding-top: 36px; }
-  .widget-header, .weather-now, .countdown-empty, .countdown-event { padding-inline: 15px; }
+  .widget-header, .weather-now, .countdown-empty, .countdown-event, .todo-summary { padding-inline: 15px; }
   .weather-now { flex-direction: column; min-height: 0; }
   .weather-actions { display: flex; flex-wrap: wrap; }
-  .quiz-summary { flex-direction: column; align-items: stretch; gap: 14px; padding: 17px 15px; }
+  .quiz-summary { padding: 17px 15px; }
   .quiz-metrics div { flex: 1; min-width: 0; }
   .dayparts li, .dayparts li:first-child { padding-inline: 8px; }
   .dayparts li:first-child { padding-left: 12px; }

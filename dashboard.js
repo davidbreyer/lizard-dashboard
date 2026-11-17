@@ -1,10 +1,13 @@
 const byId = (id) => document.getElementById(id);
 const countdownKey = 'timeuntil.events.v1';
 const quizKey = 'quiz-your-lizard:v1';
+const todoKey = 'todo-lizard:v1';
 const dashboardDate = new Intl.DateTimeFormat(undefined, { weekday: 'long', month: 'long', day: 'numeric' });
 const eventDate = new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' });
 const practiceDate = new Intl.DateTimeFormat(undefined, { dateStyle: 'medium' });
-const libraryCount = new Intl.NumberFormat();
+const taskDate = new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeZone: 'UTC' });
+const numberFormat = new Intl.NumberFormat();
+const taskPriority = ['high', 'normal', 'low'];
 const units = ['days', 'hours', 'minutes', 'seconds'];
 const unitNodes = units.map(byId);
 let selectedEvent;
@@ -42,9 +45,9 @@ function tick() {
   const today = now.toDateString();
   if (today !== displayedDate) {
     displayedDate = today;
-    const localDay = new Date(now.getTime() - now.getTimezoneOffset() * 60000);
-    byId('today').dateTime = localDay.toISOString().slice(0, 10);
+    byId('today').dateTime = localDateKey(now);
     byId('today').textContent = dashboardDate.format(now);
+    readTodoSummary();
   }
   if (!selectedEvent) return;
 
@@ -58,6 +61,68 @@ function tick() {
     const value = String(values[index]).padStart(2, '0');
     if (node.textContent !== value) node.textContent = value;
   });
+}
+
+function localDateKey(date) {
+  return new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+}
+
+function validDueDate(value) {
+  if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return '';
+  const date = new Date(`${value}T00:00:00Z`);
+  return Number.isFinite(date.getTime()) && date.toISOString().slice(0, 10) === value ? value : '';
+}
+
+function renderTodoTask(task, today) {
+  const row = byId('todo-task-template').content.firstElementChild.cloneNode(true);
+  row.querySelector('.todo-task-name').textContent = task.title;
+  row.querySelector('.todo-task-priority').hidden = task.priority !== 'high';
+  if (task.dueDate) {
+    const date = row.querySelector('.todo-task-due');
+    const overdue = task.dueDate < today;
+    const formatted = taskDate.format(new Date(`${task.dueDate}T00:00:00Z`));
+    date.dateTime = task.dueDate;
+    date.textContent = task.dueDate === today ? 'Due today' : `${overdue ? 'Overdue' : 'Due'} · ${formatted}`;
+    date.classList.toggle('is-overdue', overdue);
+    date.hidden = false;
+  }
+  return row;
+}
+
+function readTodoSummary() {
+  const today = byId('today').dateTime;
+  const status = byId('todo-status');
+  const list = byId('todo-list');
+  let tasks;
+  try {
+    const saved = JSON.parse(localStorage.getItem(todoKey) ?? '[]');
+    if (!Array.isArray(saved)) throw new Error('Unsupported task data.');
+    tasks = saved.filter((task) => typeof task?.title === 'string' && task.title.trim());
+  } catch {
+    status.textContent = 'Saved tasks unavailable';
+    list.replaceChildren();
+    list.hidden = true;
+    return;
+  }
+
+  const open = tasks.filter((task) => !task.completed).map((task) => ({
+    title: task.title.trim(),
+    dueDate: validDueDate(task.dueDate),
+    priority: taskPriority.includes(task.priority) ? task.priority : 'normal',
+    createdAt: typeof task.createdAt === 'string' ? Date.parse(task.createdAt) || 0 : 0
+  }));
+  open.sort((a, b) => Number(!a.dueDate) - Number(!b.dueDate) || a.dueDate.localeCompare(b.dueDate) ||
+    taskPriority.indexOf(a.priority) - taskPriority.indexOf(b.priority) || b.createdAt - a.createdAt);
+
+  let summary = tasks.length ? 'No open tasks' : 'No tasks saved in this browser yet';
+  if (open.length) {
+    const overdue = open.filter((task) => task.dueDate && task.dueDate < today).length;
+    summary = `${numberFormat.format(open.length)} open ${open.length === 1 ? 'task' : 'tasks'}`;
+    if (overdue) summary += ` · ${numberFormat.format(overdue)} overdue`;
+  }
+  if (status.textContent !== summary) status.textContent = summary;
+  list.replaceChildren(...open.slice(0, 3).map((task) => renderTodoTask(task, today)));
+  list.hidden = open.length === 0;
 }
 
 function latestPractice(history) {
@@ -92,7 +157,7 @@ function readQuizSummary() {
   byId('quiz-session-detail').hidden = !result;
   byId('quiz-score-metric').hidden = !result;
   byId('quiz-metrics').hidden = !state;
-  if (state) byId('quiz-count').textContent = libraryCount.format(state.quizzes.length);
+  if (state) byId('quiz-count').textContent = numberFormat.format(state.quizzes.length);
   if (result) {
     const mode = result.mode === 'spelling' ? 'Spelling' : 'Pop quiz';
     byId('quiz-session-detail').textContent = `${mode} · ${practiceDate.format(result.timestamp)}`;
@@ -228,10 +293,12 @@ function refreshWeatherIfStale() {
 window.addEventListener('storage', ({ key }) => {
   if (key === countdownKey || key === null) readCountdown();
   if (key === quizKey || key === null) readQuizSummary();
+  if (key === todoKey || key === null) readTodoSummary();
 });
 window.addEventListener('pageshow', () => {
   readCountdown();
   readQuizSummary();
+  readTodoSummary();
   refreshWeatherIfStale();
 });
 document.addEventListener('visibilitychange', refreshWeatherIfStale);

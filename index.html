@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#f5f5ed">
-  <meta name="description" content="Weather Lizard, Time Until, Quiz Your Lizard, and the Lizard Tools in one place.">
+  <meta name="description" content="Weather Lizard, Time Until, To Do Lizard, Quiz Your Lizard, and the Lizard Tools in one place.">
   <meta name="app-version" content="development">
   <title>Lizard Dashboard</title>
   <link rel="icon" href="lizard.png?v=development" type="image/png">
@@ -79,29 +79,51 @@
       </section>
     </div>
 
-    <section class="widget quiz" aria-labelledby="quiz-title">
-      <div class="widget-header">
-        <h2 id="quiz-title">Quiz Your Lizard</h2>
-        <a class="widget-link" href="https://www.davidbreyer.com/quiz-your-lizard/">Open quiz library <span aria-hidden="true">↗</span></a>
-      </div>
-      <div class="quiz-summary">
-        <div class="quiz-recent">
-          <p class="eyebrow">Latest practice</p>
-          <p class="quiz-name" id="quiz-session">No saved practice in this browser yet</p>
-          <p class="quiz-detail" id="quiz-session-detail" hidden></p>
+    <div class="widgets activity-widgets">
+      <section class="widget todo" aria-labelledby="todo-title">
+        <div class="widget-header">
+          <h2 id="todo-title">To Do Lizard</h2>
+          <a class="widget-link" href="https://www.davidbreyer.com/todo-lizard/">Open task list <span aria-hidden="true">↗</span></a>
         </div>
-        <dl class="quiz-metrics" id="quiz-metrics" hidden>
-          <div id="quiz-score-metric" hidden>
-            <dt>First-attempt score</dt>
-            <dd id="quiz-score"></dd>
+        <div class="todo-summary">
+          <p class="todo-status" id="todo-status" role="status">No tasks saved in this browser yet</p>
+          <ul class="todo-list" id="todo-list" aria-label="Open tasks" hidden></ul>
+          <template id="todo-task-template">
+            <li>
+              <span class="todo-task-name"></span>
+              <div class="todo-task-details">
+                <span class="todo-task-priority" hidden>High priority</span>
+                <time class="todo-task-due" hidden></time>
+              </div>
+            </li>
+          </template>
+        </div>
+      </section>
+
+      <section class="widget quiz" aria-labelledby="quiz-title">
+        <div class="widget-header">
+          <h2 id="quiz-title">Quiz Your Lizard</h2>
+          <a class="widget-link" href="https://www.davidbreyer.com/quiz-your-lizard/">Open quiz library <span aria-hidden="true">↗</span></a>
+        </div>
+        <div class="quiz-summary">
+          <div class="quiz-recent">
+            <p class="eyebrow">Latest practice</p>
+            <p class="quiz-name" id="quiz-session">No saved practice in this browser yet</p>
+            <p class="quiz-detail" id="quiz-session-detail" hidden></p>
           </div>
-          <div>
-            <dt>Quizzes in your library</dt>
-            <dd id="quiz-count"></dd>
-          </div>
-        </dl>
-      </div>
-    </section>
+          <dl class="quiz-metrics" id="quiz-metrics" hidden>
+            <div id="quiz-score-metric" hidden>
+              <dt>First-attempt score</dt>
+              <dd id="quiz-score"></dd>
+            </div>
+            <div>
+              <dt>Quizzes in your library</dt>
+              <dd id="quiz-count"></dd>
+            </div>
+          </dl>
+        </div>
+      </section>
+    </div>
 
     <section class="tools" id="tools" aria-labelledby="tools-title">
       <div class="tools-header">
