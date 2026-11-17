@@ -8,6 +8,12 @@ const practiceDate = new Intl.DateTimeFormat(undefined, { dateStyle: 'medium' })
 const taskDate = new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeZone: 'UTC' });
 const numberFormat = new Intl.NumberFormat();
 const taskPriority = ['high', 'normal', 'low'];
+// To Do Lizard reads the first 5,000 entries in its saved list.
+const maxTodoTasks = 5000;
+const todoAddToggle = byId('todo-add-toggle');
+const todoAddForm = byId('todo-add-form');
+const todoAddTitle = byId('todo-add-title');
+const todoAddError = byId('todo-add-error');
 const units = ['days', 'hours', 'minutes', 'seconds'];
 const unitNodes = units.map(byId);
 let selectedEvent;
@@ -89,15 +95,65 @@ function renderTodoTask(task, today) {
   return row;
 }
 
+function readTodoTasks() {
+  const tasks = JSON.parse(localStorage.getItem(todoKey) ?? '[]');
+  if (!Array.isArray(tasks)) throw new Error('Unsupported task data.');
+  return tasks;
+}
+
+function setTodoAddOpen(isOpen) {
+  todoAddForm.hidden = !isOpen;
+  todoAddToggle.setAttribute('aria-expanded', String(isOpen));
+  if (isOpen) {
+    todoAddTitle.focus();
+  } else {
+    todoAddForm.reset();
+    todoAddError.textContent = '';
+    todoAddToggle.focus();
+  }
+}
+
+function addTodoTask(event) {
+  event.preventDefault();
+  const title = todoAddTitle.value.trim();
+  if (!title) {
+    todoAddError.textContent = 'Enter a task name.';
+    todoAddTitle.focus();
+    return;
+  }
+
+  try {
+    const tasks = readTodoTasks();
+    if (tasks.length >= maxTodoTasks) {
+      todoAddError.textContent = 'Your task list is full.';
+      return;
+    }
+    tasks.unshift({
+      id: crypto.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+      title,
+      dueDate: '',
+      priority: 'normal',
+      completed: false,
+      createdAt: new Date().toISOString(),
+      completedAt: null
+    });
+    localStorage.setItem(todoKey, JSON.stringify(tasks));
+  } catch {
+    todoAddError.textContent = 'Could not save the task in this browser.';
+    return;
+  }
+
+  readTodoSummary();
+  setTodoAddOpen(false);
+}
+
 function readTodoSummary() {
   const today = byId('today').dateTime;
   const status = byId('todo-status');
   const list = byId('todo-list');
   let tasks;
   try {
-    const saved = JSON.parse(localStorage.getItem(todoKey) ?? '[]');
-    if (!Array.isArray(saved)) throw new Error('Unsupported task data.');
-    tasks = saved.filter((task) => typeof task?.title === 'string' && task.title.trim());
+    tasks = readTodoTasks().filter((task) => typeof task?.title === 'string' && task.title.trim());
   } catch {
     status.textContent = 'Saved tasks unavailable';
     list.replaceChildren();
@@ -342,6 +398,15 @@ window.addEventListener('pageshow', () => {
   refreshWeatherIfStale();
 });
 document.addEventListener('visibilitychange', refreshWeatherIfStale);
+todoAddToggle.addEventListener('click', () => setTodoAddOpen(todoAddForm.hidden));
+byId('todo-add-cancel').addEventListener('click', () => setTodoAddOpen(false));
+todoAddForm.addEventListener('submit', addTodoTask);
+todoAddTitle.addEventListener('input', () => { todoAddError.textContent = ''; });
+todoAddForm.addEventListener('keydown', (event) => {
+  if (event.key !== 'Escape') return;
+  event.preventDefault();
+  setTodoAddOpen(false);
+});
 locationButton.addEventListener('click', () => updateWeather('locate'));
 defaultButton.addEventListener('click', () => updateWeather('default'));
 retryButton.addEventListener('click', () => updateWeather());
