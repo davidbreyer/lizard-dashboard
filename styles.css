@@ -158,17 +158,19 @@ h1 { font-size: clamp(54px, 8.1vw, 108px); line-height: .93; }
 .todo-task-name { min-width: 0; font-size: 15px; font-weight: 600; overflow-wrap: anywhere; }
 .todo-task-details { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 9px; color: #63503a; font-size: 12px; }
 .todo-task-priority, .todo-task-due.is-overdue { color: #863822; font-weight: 700; }
-.quiz { background: #f3eff5; border: 1px solid #ded6e3; }
-.quiz .widget-header { border-color: #ded6e3; }
+.quiz { color: #f0efe2; background: radial-gradient(circle at 20% 35%, #ffffff0a 0 .6px, transparent .9px) 0 0 / 9px 13px, #20382e; border: 1px solid #899c8780; box-shadow: inset 0 -4px #84654a; }
+.quiz .widget-header { border-color: #899c8766; }
+.quiz .widget-link { color: #e5d496; }
+.quiz :focus-visible { outline-color: #e5d496; }
 .quiz-summary { display: flex; flex-direction: column; gap: 14px; padding: 19px 23px 23px; }
 .quiz-recent { min-width: 0; }
-.quiz-recent .eyebrow { color: #5e5265; margin-bottom: 4px; }
-.quiz-name { font-family: var(--serif); font-size: clamp(26px, 3vw, 38px); line-height: 1.05; overflow-wrap: anywhere; }
-.quiz-detail { margin-top: 5px; font-size: 13px; color: #5e5265; }
+.quiz-recent .eyebrow { color: #e5d496; margin-bottom: 4px; }
+.quiz-name { font-family: 'Segoe Print', 'Bradley Hand', 'Chalkboard SE', Georgia, serif; font-size: clamp(24px, 2.5vw, 32px); line-height: 1.3; overflow-wrap: anywhere; text-shadow: .4px 0 #f0efe240; }
+.quiz-detail { margin-top: 5px; font-size: 13px; color: #bbc6b9; }
 .quiz-metrics { display: flex; gap: 9px; flex: 0 0 auto; }
-.quiz-metrics div { display: flex; flex-direction: column-reverse; min-width: 134px; padding: 8px 12px; border-radius: 11px; background: #eae2ee; }
-.quiz-metrics dd { font-size: 27px; font-weight: 600; font-variant-numeric: tabular-nums; letter-spacing: -.04em; }
-.quiz-metrics dt { color: #5e5265; font-size: 11px; font-weight: 600; }
+.quiz-metrics div { display: flex; flex-direction: column-reverse; min-width: 134px; padding: 8px 12px; border: 1px dashed #899c8780; border-radius: 4px; }
+.quiz-metrics dd { font-size: 27px; font-weight: 600; font-variant-numeric: tabular-nums; letter-spacing: -.04em; color: #e5d496; }
+.quiz-metrics dt { color: #bbc6b9; font-size: 11px; font-weight: 600; }
 .tools { margin-block: 38px 35px; }
 .tools-header { margin-bottom: 14px; }
 .tools h2 { font-size: clamp(38px, 4vw, 52px); line-height: 1; }
