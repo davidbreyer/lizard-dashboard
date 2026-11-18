@@ -2,7 +2,7 @@ import { RECENT_TOOLS_KEY, validRecentTools } from './recent-tools.mjs?v=develop
 
 // Storage contracts audited against the Lizard apps in November 2026.
 // Values stay as their original strings so a backup preserves every saved field.
-export const CARD_IDS = ['weather-card', 'countdown-card', 'todo-card', 'quiz-card', 'upcoming-card'];
+export const CARD_IDS = ['weather-card', 'countdown-card', 'todo-card', 'quiz-card', 'upcoming-card', 'clock-card'];
 export const MAX_BACKUP_BYTES = 32 * 1024 * 1024;
 export const BACKUP_APPS = [
   { id: 'dashboard', name: 'Dashboard', keys: ['lizard-dashboard.hidden-cards.v1', 'lizard-dashboard.card-order.v1', RECENT_TOOLS_KEY], detail: 'Card choices, order and recent tools' },

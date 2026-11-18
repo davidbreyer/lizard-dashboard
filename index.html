@@ -23,7 +23,14 @@
   </header>
 
   <main class="shell">
-    <h1 class="dashboard-date"><time id="today">Today</time></h1>
+    <div class="dashboard-topline">
+      <h1 class="dashboard-date"><time id="today">Today</time></h1>
+      <div class="dashboard-awake-control">
+        <label class="dashboard-awake-toggle"><input type="checkbox" id="dashboard-keep-awake" role="switch" autocomplete="off" aria-describedby="dashboard-awake-status dashboard-awake-help"><span>Keep screen awake</span></label>
+        <span class="dashboard-awake-status" id="dashboard-awake-status" role="status">Off</span>
+        <span class="sr-only" id="dashboard-awake-help">Applies to the entire dashboard while this tab is visible. Starts off each time the page is reloaded.</span>
+      </div>
+    </div>
 
     <dialog class="card-settings" id="card-settings" aria-labelledby="card-settings-title">
       <form method="dialog">
@@ -49,6 +56,10 @@
           <div class="card-choice" data-card="upcoming-card">
             <label><input type="checkbox" value="upcoming-card" checked> Upcoming</label>
             <div class="card-move"><button type="button" data-move="-1" aria-label="Move Upcoming up">↑</button><button type="button" data-move="1" aria-label="Move Upcoming down">↓</button></div>
+          </div>
+          <div class="card-choice" data-card="clock-card">
+            <label><input type="checkbox" value="clock-card" checked> Clock</label>
+            <div class="card-move"><button type="button" data-move="-1" aria-label="Move Clock up">↑</button><button type="button" data-move="1" aria-label="Move Clock down">↓</button></div>
           </div>
         </div>
         <p class="card-settings-status" id="card-settings-status" role="status"></p>
@@ -232,6 +243,24 @@
               <p class="upcoming-item-details"><span class="upcoming-item-kind"></span><span class="upcoming-item-priority" hidden>High priority</span><time class="upcoming-item-time" hidden></time></p>
             </li>
           </template>
+        </div>
+      </section>
+      <section class="widget clock" id="clock-card" aria-labelledby="clock-title">
+        <div class="widget-header">
+          <h2 id="clock-title">Clock</h2>
+          <div class="clock-header-actions">
+            <span class="clock-color-control"><select id="clock-color" aria-label="Clock color"><option value="ember">Ember</option><option value="violet">Violet</option><option value="tidal">Tidal</option><option value="gold">Gold</option></select></span>
+            <a class="widget-link" href="https://www.davidbreyer.com/timeuntil/clock.html" target="_blank" rel="noopener" aria-label="Open Time Until clock in a new tab">Full clock</a>
+          </div>
+        </div>
+        <div class="clock-body">
+          <div class="clock-face" role="timer" aria-label="Local clock" aria-live="off" aria-describedby="clock-detail">
+            <svg class="clock-seconds-ring" viewBox="0 0 480 480" aria-hidden="true"><g id="clock-dots"></g></svg>
+            <time class="clock-time" id="clock-time">--:--</time>
+          </div>
+          <p class="clock-local-label">Local time</p>
+          <p class="sr-only" id="clock-detail">The colored dots show the seconds remaining in this minute.</p>
+          <p class="clock-color-status" id="clock-color-status" role="status"></p>
         </div>
       </section>
     </div>

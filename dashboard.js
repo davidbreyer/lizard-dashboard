@@ -2,6 +2,8 @@ import { CARD_IDS, normalizeCardOrder } from './backup.mjs?v=development';
 import { initBackup } from './backup-ui.mjs?v=development';
 import { buildUpcoming } from './upcoming.mjs?v=development';
 import { RECENT_TOOLS_KEY, refreshRecentTools } from './recent-tools.mjs?v=development';
+import { CLOCK_COLOR_KEY, initClockCard } from './clock.mjs?v=development';
+import { initKeepAwake } from './wake-lock.mjs?v=development';
 
 const byId = (id) => document.getElementById(id);
 const countdownKey = 'timeuntil.events.v1';
@@ -13,6 +15,8 @@ let cardOrder = [...CARD_IDS];
 const cardSettings = byId('card-settings');
 const cardChoices = [...cardSettings.querySelectorAll('input[type="checkbox"]')];
 const weatherCard = byId('weather-card');
+const clockCard = initClockCard();
+initKeepAwake();
 const dashboardDate = new Intl.DateTimeFormat(undefined, { weekday: 'long', month: 'long', day: 'numeric' });
 const eventDate = new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' });
 const practiceDate = new Intl.DateTimeFormat(undefined, { dateStyle: 'medium' });
@@ -602,6 +606,7 @@ function applyCardVisibility() {
     card.classList.toggle('widget-wide', choice === wideCard);
   }
   byId('cards-empty').hidden = visible.length > 0;
+  clockCard.refresh();
   if (weatherWasHidden && !weatherCard.hidden) updateWeather();
 }
 
@@ -645,6 +650,7 @@ window.addEventListener('storage', ({ key }) => {
   if (key === quizKey || key === null) readQuizSummary();
   if (key === todoKey || key === null) readTodoSummary();
   if (key === weatherLocationKey || key === null) refreshSavedWeather();
+  if (key === CLOCK_COLOR_KEY || key === null) clockCard.restoreColor();
 });
 window.addEventListener('pageshow', () => {
   readCountdown();
@@ -690,6 +696,7 @@ byId('upcoming-more').addEventListener('click', () => {
 });
 
 initBackup({ onRestore(keys) {
+  if (keys.includes(CLOCK_COLOR_KEY)) clockCard.restoreColor();
   if (keys.includes(RECENT_TOOLS_KEY)) refreshRecentTools();
   if (keys.includes(hiddenCardsKey) || keys.includes(cardOrderKey)) readCardVisibility();
   if (keys.includes(countdownKey)) readCountdown();

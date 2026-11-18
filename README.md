@@ -17,6 +17,17 @@ the next six days. It initially shows six items, with Show all for busy weeks.
 Past countdowns, overdue/completed tasks and undated tasks stay out of this view.
 The card updates when saved data changes, an event passes, or a new day starts.
 
+**Clock** mirrors Time Until's local 24-hour clock and sixty-dot seconds ring.
+Its color picker shares Time Until's saved clock color and is included in that
+app's backup. Clock can be hidden and reordered like every other card.
+
+**Keep screen awake**, beside the dashboard date, applies to the whole dashboard
+even when Clock is hidden. It starts off on each page load. On supported secure
+browsers it holds a screen wake lock while the dashboard is visible, releases it
+when the page is hidden/left, and resumes on return if still enabled. Active,
+paused and unavailable states are displayed. This temporary power setting is not
+stored in backups.
+
 Use **Backup & restore** in Cards or the footer to download a JSON snapshot.
 Choose a dashboard backup to preview the apps it contains, select which apps
 to restore, and press **Restore selected apps**. Selected apps' included storage

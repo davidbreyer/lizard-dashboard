@@ -10,6 +10,8 @@ on:
       - 'backup*.mjs'
       - 'upcoming.mjs'
       - 'recent-tools.mjs'
+      - 'clock.mjs'
+      - 'wake-lock.mjs'
       - 'tests/**'
       - 'styles.css'
       - 'lizard.png'
