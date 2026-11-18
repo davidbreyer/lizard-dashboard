@@ -97,6 +97,7 @@
         </div>
       </section>
       <section class="widget todo" id="todo-card" aria-labelledby="todo-title">
+        <div class="todo-binding" aria-hidden="true"><span></span><span></span></div>
         <div class="widget-header">
           <h2 id="todo-title">To Do Lizard</h2>
           <div class="todo-actions">
@@ -119,11 +120,14 @@
           <p class="todo-add-error" id="todo-complete-error" role="status"></p>
           <template id="todo-task-template">
             <li>
-              <label class="todo-task-label"><input type="checkbox" class="todo-task-check"><span class="todo-task-name"></span></label>
-              <div class="todo-task-details">
-                <span class="todo-task-priority" hidden>High priority</span>
-                <time class="todo-task-due" hidden></time>
+              <div class="todo-task-content">
+                <label class="todo-task-label"><input type="checkbox" class="todo-task-check"><span class="todo-task-name"></span></label>
+                <div class="todo-task-details">
+                  <span class="todo-task-priority" hidden>High priority</span>
+                  <time class="todo-task-due" hidden></time>
+                </div>
               </div>
+              <time class="todo-task-stamp" aria-hidden="true" hidden><span class="todo-task-month"></span><span class="todo-task-day"></span></time>
             </li>
           </template>
         </div>

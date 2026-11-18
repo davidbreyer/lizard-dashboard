@@ -10,6 +10,7 @@ const dashboardDate = new Intl.DateTimeFormat(undefined, { weekday: 'long', mont
 const eventDate = new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' });
 const practiceDate = new Intl.DateTimeFormat(undefined, { dateStyle: 'medium' });
 const taskDate = new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeZone: 'UTC' });
+const taskMonth = new Intl.DateTimeFormat(undefined, { month: 'short', timeZone: 'UTC' });
 const numberFormat = new Intl.NumberFormat();
 const taskPriority = ['high', 'normal', 'low'];
 // To Do Lizard reads the first 5,000 entries in its saved list.
@@ -126,14 +127,23 @@ function renderTodoTask(task, today) {
   checkbox.setAttribute('aria-label', `Complete ${task.title}`);
   checkbox.addEventListener('change', () => completeTodoTask(task.source, checkbox));
   row.querySelector('.todo-task-priority').hidden = task.priority !== 'high';
+  row.querySelector('.todo-task-details').hidden = !task.dueDate && task.priority !== 'high';
   if (task.dueDate) {
     const date = row.querySelector('.todo-task-due');
     const overdue = task.dueDate < today;
-    const formatted = taskDate.format(new Date(`${task.dueDate}T00:00:00Z`));
+    const due = new Date(`${task.dueDate}T00:00:00Z`);
+    const formatted = taskDate.format(due);
     date.dateTime = task.dueDate;
     date.textContent = task.dueDate === today ? 'Due today' : `${overdue ? 'Overdue' : 'Due'} · ${formatted}`;
     date.classList.toggle('is-overdue', overdue);
     date.hidden = false;
+    const stamp = row.querySelector('.todo-task-stamp');
+    stamp.dateTime = task.dueDate;
+    stamp.querySelector('.todo-task-month').textContent = taskMonth.format(due);
+    stamp.querySelector('.todo-task-day').textContent = due.getUTCDate();
+    stamp.hidden = false;
+    stamp.classList.toggle('is-overdue', overdue);
+    row.classList.add('has-due-date');
   }
   return row;
 }
