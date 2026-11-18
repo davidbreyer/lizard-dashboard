@@ -46,6 +46,10 @@
             <label><input type="checkbox" value="quiz-card" checked> Quiz Your Lizard</label>
             <div class="card-move"><button type="button" data-move="-1" aria-label="Move Quiz Your Lizard up">↑</button><button type="button" data-move="1" aria-label="Move Quiz Your Lizard down">↓</button></div>
           </div>
+          <div class="card-choice" data-card="upcoming-card">
+            <label><input type="checkbox" value="upcoming-card" checked> Upcoming</label>
+            <div class="card-move"><button type="button" data-move="-1" aria-label="Move Upcoming up">↑</button><button type="button" data-move="1" aria-label="Move Upcoming down">↓</button></div>
+          </div>
         </div>
         <p class="card-settings-status" id="card-settings-status" role="status"></p>
         <div class="settings-actions">
@@ -202,6 +206,25 @@
               <dd id="quiz-count"></dd>
             </div>
           </dl>
+        </div>
+      </section>
+      <section class="widget upcoming" id="upcoming-card" aria-labelledby="upcoming-title">
+        <div class="widget-header">
+          <h2 id="upcoming-title">Upcoming</h2>
+          <span class="upcoming-window">Next 7 days</span>
+        </div>
+        <div class="upcoming-content">
+          <p class="upcoming-status" id="upcoming-status" role="status">Nothing scheduled in the next 7 days.</p>
+          <p class="upcoming-error" id="upcoming-error" role="status" hidden></p>
+          <p class="upcoming-help" id="upcoming-help">Add due dates in <a href="https://www.davidbreyer.com/todo-lizard/" target="_blank" rel="noopener">To Do Lizard <span role="img" aria-label="Opens in a new tab">↗</span></a> or events in <a href="https://www.davidbreyer.com/timeuntil/" target="_blank" rel="noopener">Time Until <span role="img" aria-label="Opens in a new tab">↗</span></a>.</p>
+          <ol class="upcoming-list" id="upcoming-list" aria-label="Upcoming tasks and countdowns" hidden></ol>
+          <button type="button" class="cards-button upcoming-more" id="upcoming-more" aria-expanded="false" aria-controls="upcoming-list" hidden>Show all</button>
+          <template id="upcoming-item-template">
+            <li class="upcoming-item">
+              <a class="upcoming-item-link" target="_blank" rel="noopener"><span class="upcoming-item-name"></span><span class="upcoming-arrow" role="img" aria-label="Opens in a new tab">↗</span></a>
+              <p class="upcoming-item-details"><span class="upcoming-item-kind"></span><span class="upcoming-item-priority" hidden>High priority</span><time class="upcoming-item-time" hidden></time></p>
+            </li>
+          </template>
         </div>
       </section>
     </div>

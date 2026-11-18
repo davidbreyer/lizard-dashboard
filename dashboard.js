@@ -1,5 +1,6 @@
 import { CARD_IDS, normalizeCardOrder } from './backup.mjs?v=development';
 import { initBackup } from './backup-ui.mjs?v=development';
+import { buildUpcoming } from './upcoming.mjs?v=development';
 
 const byId = (id) => document.getElementById(id);
 const countdownKey = 'timeuntil.events.v1';
@@ -16,6 +17,9 @@ const eventDate = new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', time
 const practiceDate = new Intl.DateTimeFormat(undefined, { dateStyle: 'medium' });
 const taskDate = new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeZone: 'UTC' });
 const taskMonth = new Intl.DateTimeFormat(undefined, { month: 'short', timeZone: 'UTC' });
+const upcomingDate = new Intl.DateTimeFormat(undefined, { month: 'short', day: 'numeric', timeZone: 'UTC' });
+const upcomingWeekday = new Intl.DateTimeFormat(undefined, { weekday: 'long', timeZone: 'UTC' });
+const upcomingTime = new Intl.DateTimeFormat(undefined, { hour: 'numeric', minute: '2-digit' });
 const numberFormat = new Intl.NumberFormat();
 const taskPriority = ['high', 'normal', 'low'];
 // To Do Lizard reads the first 5,000 entries in its saved list.
@@ -35,6 +39,9 @@ const countdownThemes = {
 };
 let selectedEvent;
 let displayedDate;
+let upcomingRefreshAt = 0;
+let upcomingExpanded = false;
+let upcomingSignature = '';
 
 function savedCountdowns(state) {
   return Array.isArray(state?.events) ? state.events.filter((event) =>
@@ -74,6 +81,7 @@ function readCountdown() {
     byId('countdown-help').textContent = storageUnavailable ? 'Open Time Until to check your saved events.' : 'Add or import a countdown in Time Until using this browser.';
   }
   tick();
+  readUpcoming();
 }
 
 function selectCountdown() {
@@ -101,6 +109,7 @@ function tick() {
     byId('today').textContent = dashboardDate.format(now);
     readTodoSummary();
   }
+  if (now.getTime() >= upcomingRefreshAt) readUpcoming();
   if (!selectedEvent) return;
 
   const delta = selectedEvent.timestamp - now.getTime();
@@ -233,6 +242,7 @@ function addTodoTask(event) {
 }
 
 function readTodoSummary() {
+  readUpcoming();
   const today = byId('today').dateTime;
   const status = byId('todo-status');
   const list = byId('todo-list');
@@ -265,6 +275,85 @@ function readTodoSummary() {
   if (status.textContent !== summary) status.textContent = summary;
   list.replaceChildren(...open.slice(0, 3).map((task) => renderTodoTask(task, today)));
   list.hidden = open.length === 0;
+}
+
+function readUpcoming() {
+  let tasks = [], events = [];
+  const errors = [];
+  try { tasks = readTodoTasks(); }
+  catch { errors.push('Saved tasks unavailable.'); }
+  try {
+    const state = JSON.parse(localStorage.getItem(countdownKey));
+    if (state !== null && !Array.isArray(state?.events)) throw new Error('Invalid saved countdowns.');
+    events = savedCountdowns(state);
+  } catch { errors.push('Saved countdowns unavailable.'); }
+  const now = new Date();
+  const schedule = buildUpcoming({ tasks, events }, now);
+  const { items, startKey } = schedule;
+  upcomingRefreshAt = schedule.refreshAt;
+  const tasksCount = items.filter(item => item.kind === 'task').length;
+  const eventsCount = items.length - tasksCount;
+  const summary = items.length
+    ? numberFormat.format(tasksCount) + (tasksCount === 1 ? ' task' : ' tasks') + ' · ' +
+      numberFormat.format(eventsCount) + (eventsCount === 1 ? ' countdown' : ' countdowns')
+    : errors.length ? 'No upcoming items could be shown.' : 'Nothing scheduled in the next 7 days.';
+  const status = byId('upcoming-status');
+  if (status.textContent !== summary) status.textContent = summary;
+  const error = byId('upcoming-error');
+  error.textContent = errors.join(' ');
+  error.hidden = errors.length === 0;
+  byId('upcoming-help').hidden = items.length > 0 || errors.length > 0;
+  const shown = upcomingExpanded ? items : items.slice(0, 6);
+  const signature = JSON.stringify([startKey, shown]);
+  const list = byId('upcoming-list');
+  if (signature !== upcomingSignature) {
+    upcomingSignature = signature;
+    const groups = [];
+    const tomorrow = localDateKey(new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1));
+    let dayKey, dayList;
+    for (const item of shown) {
+      if (item.dateKey !== dayKey) {
+        dayKey = item.dateKey;
+        const group = document.createElement('li');
+        group.className = 'upcoming-group';
+        const heading = document.createElement('h3');
+        const time = document.createElement('time');
+        time.dateTime = dayKey;
+        const date = new Date(dayKey + 'T00:00:00Z');
+        const relative = document.createElement('span');
+        relative.className = 'upcoming-relative';
+        relative.textContent = dayKey === startKey ? 'Today' : dayKey === tomorrow ? 'Tomorrow' : upcomingWeekday.format(date);
+        const label = document.createElement('span');
+        label.className = 'upcoming-group-date';
+        label.textContent = dayKey.slice(0, 4) === startKey.slice(0, 4) ? upcomingDate.format(date) : taskDate.format(date);
+        time.append(relative, label);
+        heading.append(time);
+        dayList = document.createElement('ul');
+        dayList.className = 'upcoming-day-items';
+        group.append(heading, dayList);
+        groups.push(group);
+      }
+      const row = byId('upcoming-item-template').content.firstElementChild.cloneNode(true);
+      row.querySelector('.upcoming-item-name').textContent = item.title;
+      row.querySelector('a').href = item.kind === 'task'
+        ? 'https://www.davidbreyer.com/todo-lizard/' : 'https://www.davidbreyer.com/timeuntil/';
+      row.querySelector('.upcoming-item-kind').textContent = item.kind === 'task' ? 'Task' : 'Countdown';
+      row.querySelector('.upcoming-item-priority').hidden = item.kind !== 'task' || item.priority !== 'high';
+      if (item.kind === 'event') {
+        const time = row.querySelector('.upcoming-item-time');
+        time.hidden = false;
+        time.dateTime = new Date(item.timestamp).toISOString();
+        time.textContent = upcomingTime.format(item.timestamp);
+      }
+      dayList.append(row);
+    }
+    list.replaceChildren(...groups);
+  }
+  list.hidden = items.length === 0;
+  const more = byId('upcoming-more');
+  more.hidden = items.length <= 6;
+  more.textContent = upcomingExpanded ? 'Show fewer' : 'Show all ' + numberFormat.format(items.length);
+  more.setAttribute('aria-expanded', String(upcomingExpanded));
 }
 
 function latestPractice(history) {
@@ -596,6 +685,10 @@ todoAddForm.addEventListener('keydown', (event) => {
 locationButton.addEventListener('click', () => updateWeather('locate'));
 defaultButton.addEventListener('click', () => updateWeather('default'));
 retryButton.addEventListener('click', () => updateWeather());
+byId('upcoming-more').addEventListener('click', () => {
+  upcomingExpanded = !upcomingExpanded;
+  readUpcoming();
+});
 
 initBackup({ onRestore(keys) {
   if (keys.includes(hiddenCardsKey) || keys.includes(cardOrderKey)) readCardVisibility();

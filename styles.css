@@ -247,6 +247,33 @@ h1 { font-size: clamp(54px, 8.1vw, 108px); line-height: .93; }
 .tool-featured small { color: #e1e6d8; }
 .tool-featured .tool-arrow { color: var(--leaf); }
 .directory-links .tool-featured:hover { background: #305045; border-color: #305045; }
+.upcoming { border: 1px solid #d4dfd3; background: #f8faf3; color: #243b31; }
+.upcoming .widget-header { border-color: #d4dfd3; }
+.upcoming-window { color: #52634f; font-size: 12px; white-space: nowrap; }
+.upcoming-content { padding: 18px 23px 22px; }
+.upcoming-status { color: #52634f; font-size: 13px; font-weight: 600; }
+.upcoming-help, .upcoming-error { margin-top: 9px; font-size: 13px; line-height: 1.6; }
+.upcoming-error { color: #863822; }
+.upcoming-list, .upcoming-day-items { margin: 0; padding: 0; list-style: none; }
+.upcoming-list { margin-top: 14px; }
+.upcoming-group { display: grid; grid-template-columns: 105px minmax(0, 1fr); gap: 18px; padding-block: 13px; border-top: 1px solid #dce5d8; }
+.upcoming-group:last-child { padding-bottom: 0; }
+.upcoming-group h3 { padding-top: 2px; font-size: 13px; }
+.upcoming-relative { display: block; font-weight: 700; }
+.upcoming-group-date { display: block; margin-top: 4px; color: #52634f; font-size: 12px; font-weight: 400; }
+.upcoming-day-items { display: grid; gap: 12px; }
+.upcoming-item { min-width: 0; }
+.upcoming-item-link { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; min-height: 24px; font-size: 15px; font-weight: 600; line-height: 1.4; text-decoration: none; }
+.upcoming-item-link:hover .upcoming-item-name { text-decoration: underline; }
+.upcoming-item-name { min-width: 0; overflow-wrap: anywhere; }
+.upcoming-arrow { flex-shrink: 0; color: #63765d; font-size: 13px; }
+.upcoming-item-details { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 9px; margin-top: 2px; color: #52634f; font-size: 12px; }
+.upcoming-item-kind { font-weight: 600; }
+.upcoming-item-priority { color: #7c2929; }
+.upcoming-more { margin-top: 18px; }
+@media (min-width: 851px) {
+  .upcoming.widget-wide .upcoming-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 28px; align-items: start; }
+}
 .site-footer { border-top: 1px solid var(--line); padding-block: 20px 26px; font-size: 12px; color: var(--muted); }
 .site-footer a { text-decoration: none; }
 .site-footer a:hover { text-decoration: underline; }
@@ -271,6 +298,10 @@ h1 { font-size: clamp(54px, 8.1vw, 108px); line-height: .93; }
   .weather-now { flex-direction: column; min-height: 0; }
   .weather-actions { display: flex; flex-wrap: wrap; }
   .quiz-summary { padding: 17px 15px; }
+  .upcoming-content { padding: 17px 15px 20px; }
+  .upcoming-group { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+  .upcoming-group h3 time { display: flex; align-items: baseline; flex-wrap: wrap; gap: 8px; }
+  .upcoming-group-date { margin-top: 0; }
   .quiz-metrics div { flex: 1; min-width: 0; }
   .dayparts li, .dayparts li:first-child { padding-inline: 8px; }
   .dayparts li:first-child { padding-left: 12px; }

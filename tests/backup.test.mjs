@@ -123,7 +123,7 @@ test('an unchanged restore performs no writes', () => {
 });
 
 test('card order normalization preserves valid choices and appends missing/new cards', () => {
-  assert.deepEqual(normalizeCardOrder(['todo-card', 'todo-card', 'unknown']), ['todo-card', 'weather-card', 'countdown-card', 'quiz-card']);
+  assert.deepEqual(normalizeCardOrder(['todo-card', 'todo-card', 'unknown']), ['todo-card', 'weather-card', 'countdown-card', 'quiz-card', 'upcoming-card']);
   assert.deepEqual(normalizeCardOrder(null), CARD_IDS);
   assert.deepEqual(normalizeCardOrder({ invalid: true }), CARD_IDS);
 });
@@ -131,4 +131,17 @@ test('card order normalization preserves valid choices and appends missing/new c
 test('inventory reports countdown totals even though clock color is stored as plain text', () => {
   assert.equal(describeApp(BACKUP_APPS.find(app => app.id === 'timeuntil'), parsed().apps.timeuntil), '1 countdown · clock preferences');
   assert.equal(describeApp(BACKUP_APPS[0], undefined), 'No saved data');
+});
+
+test('existing card layouts gain Upcoming without changing their saved order or other data', () => {
+  const oldOrder = JSON.parse(fixtures['lizard-dashboard.card-order.v1']);
+  assert.deepEqual(normalizeCardOrder(oldOrder), [...oldOrder, 'upcoming-card']);
+  const incoming = parsed();
+  incoming.apps.dashboard['lizard-dashboard.card-order.v1'] = json(['upcoming-card', ...oldOrder]);
+  incoming.apps.dashboard['lizard-dashboard.hidden-cards.v1'] = json(['upcoming-card']);
+  const target = new Storage(fixtures);
+  restoreBackup(target, incoming, ['dashboard']);
+  assert.equal(target.getItem('lizard-dashboard.card-order.v1'), json(['upcoming-card', ...oldOrder]));
+  assert.equal(target.getItem('lizard-dashboard.hidden-cards.v1'), '["upcoming-card"]');
+  assert.equal(target.getItem('todo-lizard:v1'), fixtures['todo-lizard:v1']);
 });

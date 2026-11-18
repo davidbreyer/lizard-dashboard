@@ -2,8 +2,14 @@
 
 The dashboard reads saved Lizard app data from the same browser and origin.
 
-Use **Cards** to show, hide and reorder the four cards. The arrow buttons work
+Use **Cards** to show, hide and reorder the dashboard cards. The arrow buttons work
 with a keyboard or on a phone. Card choices and order are remembered locally.
+
+**Upcoming** combines open tasks with due dates and future Time Until events,
+grouped by local calendar date. Its rolling seven-day window includes today and
+the next six days. It initially shows six items, with Show all for busy weeks.
+Past countdowns, overdue/completed tasks and undated tasks stay out of this view.
+The card updates when saved data changes, an event passes, or a new day starts.
 
 Use **Backup & restore** in Cards or the footer to download a JSON snapshot.
 Choose a dashboard backup to preview the apps it contains, select which apps
