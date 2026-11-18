@@ -21,6 +21,12 @@ const todoAddError = byId('todo-add-error');
 const units = ['days', 'hours', 'minutes', 'seconds'];
 const unitNodes = units.map(byId);
 const countdownSelect = byId('countdown-select');
+const countdownThemes = {
+  ember: ['#ff915d', '255,145,93'],
+  violet: ['#b5a3ff', '181,163,255'],
+  tidal: ['#79d8d0', '121,216,208'],
+  gold: ['#f4ce71', '244,206,113']
+};
 let selectedEvent;
 let displayedDate;
 
@@ -49,6 +55,10 @@ function readCountdown() {
   byId('countdown-title-picker').classList.toggle('can-select', events.length > 1);
   byId('countdown-empty').hidden = Boolean(selectedEvent);
   byId('countdown-event').hidden = !selectedEvent;
+  const theme = Object.hasOwn(countdownThemes, selectedEvent?.color) ? selectedEvent.color : 'ember';
+  const [accent, rgb] = countdownThemes[theme];
+  byId('countdown-card').style.setProperty('--countdown-accent', accent);
+  byId('countdown-card').style.setProperty('--countdown-rgb', rgb);
   if (selectedEvent) {
     byId('event-name').textContent = selectedEvent.name;
     byId('event-date').textContent = eventDate.format(selectedEvent.timestamp);
