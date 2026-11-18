@@ -158,12 +158,13 @@ h1 { font-size: clamp(54px, 8.1vw, 108px); line-height: .93; }
 .clock-icon { width: 35px; height: 35px; border: 1.5px solid var(--countdown-accent); border-radius: 50%; position: relative; margin-bottom: 16px; }
 .clock-icon::before { content: ''; position: absolute; top: 7px; left: 15px; width: 7px; height: 10px; border-left: 1.5px solid var(--countdown-accent); border-bottom: 1.5px solid var(--countdown-accent); }
 .countdown h3 { font-family: inherit; font-size: clamp(27px, 3vw, 38px); line-height: 1.15; font-weight: 450; letter-spacing: -.025em; overflow-wrap: anywhere; }
+.countdown-event h3 { font-size: clamp(22px, 2.2vw, 28px); }
 .countdown-empty p, .countdown-event time { margin-top: 9px; color: #b9bdb4; font-size: 13px; line-height: 1.5; }
 .countdown-action { display: inline-block; margin-top: 20px; font-size: 13px; font-weight: 700; color: var(--countdown-accent); }
 .countdown-event { display: flex; flex-direction: column; justify-content: center; }
 .countdown-title { position: relative; align-self: flex-start; max-width: 100%; border-radius: 4px; }
 .countdown-title.can-select { padding-right: 25px; }
-.countdown-title.can-select::after { content: ''; position: absolute; right: 3px; top: 12px; width: 8px; height: 8px; border-right: 1.5px solid var(--countdown-accent); border-bottom: 1.5px solid var(--countdown-accent); transform: rotate(45deg); pointer-events: none; }
+.countdown-title.can-select::after { content: ''; position: absolute; right: 3px; top: 9px; width: 8px; height: 8px; border-right: 1.5px solid var(--countdown-accent); border-bottom: 1.5px solid var(--countdown-accent); transform: rotate(45deg); pointer-events: none; }
 .countdown-title.can-select:hover h3 { color: var(--countdown-accent); }
 .countdown-title:focus-within { outline: 2px solid var(--countdown-accent); outline-offset: 4px; }
 .countdown-select { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; font: inherit; font-size: 16px; }
@@ -171,8 +172,8 @@ h1 { font-size: clamp(54px, 8.1vw, 108px); line-height: .93; }
 .countdown-error:not(:empty) { margin-top: 10px; }
 .countdown-mode { margin-bottom: 9px; color: var(--countdown-accent); }
 .countdown-units { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin-top: 24px; }
-.countdown-units div { display: flex; flex-direction: column-reverse; align-items: center; justify-content: center; padding: 8px 3px; border-top: 1px solid #ffffff18; }
-.countdown-units dd { font-family: Consolas, 'SFMono-Regular', monospace; font-size: clamp(20px, 3vw, 37px); font-weight: 400; font-variant-numeric: tabular-nums; letter-spacing: -.055em; overflow-wrap: anywhere; }
+.countdown-units div { container-type: inline-size; display: flex; flex-direction: column-reverse; align-items: center; justify-content: center; padding: 12px 3px; border-top: 1px solid #ffffff18; }
+.countdown-units dd { font-family: Consolas, 'SFMono-Regular', monospace; font-size: clamp(36px, 5vw, 56px); font-size: min(clamp(36px, 5vw, 56px), calc(100cqi / var(--digits, 2) / .62)); line-height: 1.1; font-weight: 500; font-variant-numeric: tabular-nums; letter-spacing: -.045em; overflow-wrap: anywhere; }
 .countdown-units #seconds { color: var(--countdown-accent); }
 .countdown-units dt { font-size: 11px; color: #b9bdb4; }
 .todo { color: #203b2c; background: #fffdf6; border: 1px solid #e2e4d8; }

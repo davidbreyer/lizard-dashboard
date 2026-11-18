@@ -111,7 +111,10 @@ function tick() {
   if (byId('countdown-mode').textContent !== mode) byId('countdown-mode').textContent = mode;
   unitNodes.forEach((node, index) => {
     const value = String(values[index]).padStart(2, '0');
-    if (node.textContent !== value) node.textContent = value;
+    if (node.textContent !== value) {
+      node.textContent = value;
+      node.style.setProperty('--digits', value.length);
+    }
   });
 }
 
