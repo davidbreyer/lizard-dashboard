@@ -202,9 +202,11 @@ h1 { font-size: clamp(54px, 8.1vw, 108px); line-height: .93; }
 .todo-list li.has-due-date { grid-template-columns: minmax(0, 1fr) 36px; }
 .todo-list li:last-child { padding-bottom: 0; }
 .todo-task-content { min-width: 0; }
-.todo-task-label { display: flex; align-items: baseline; gap: 9px; min-width: 0; min-height: 24px; cursor: pointer; }
+.todo-task-heading { display: flex; align-items: baseline; gap: 9px; min-width: 0; min-height: 24px; }
 .todo-task-check { flex-shrink: 0; width: 17px; height: 17px; margin: 0; align-self: center; accent-color: #277a48; cursor: pointer; }
-.todo-task-name { min-width: 0; font-size: 15px; font-weight: 600; overflow-wrap: anywhere; }
+.todo-task-link { min-width: 0; font-size: 15px; font-weight: 600; line-height: 1.4; overflow-wrap: anywhere; text-decoration: none; }
+.todo-task-link:hover .todo-task-name { text-decoration: underline; }
+.todo-task-open { color: #553a68; font-size: 12px; }
 .todo-task-details { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 9px; margin: 3px 0 0 26px; color: #657267; font-size: 12px; }
 .todo-task-priority, .todo-task-due.is-overdue { color: #7c2929; font-weight: 700; }
 .todo-task-stamp { width: 36px; border: 1px solid #e2e4d8; border-radius: 4px; background: #fff; text-align: center; overflow: hidden; }

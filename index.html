@@ -173,7 +173,10 @@
           <template id="todo-task-template">
             <li>
               <div class="todo-task-content">
-                <label class="todo-task-label"><input type="checkbox" class="todo-task-check"><span class="todo-task-name"></span></label>
+                <div class="todo-task-heading">
+                  <input type="checkbox" class="todo-task-check">
+                  <a class="todo-task-link" href="https://www.davidbreyer.com/todo-lizard/" target="_blank" rel="noopener"><span class="todo-task-name"></span> <span class="todo-task-open" role="img" aria-label="Opens in a new tab">↗</span></a>
+                </div>
                 <div class="todo-task-details">
                   <span class="todo-task-priority" hidden>High priority</span>
                   <time class="todo-task-due" hidden></time>
