@@ -113,7 +113,12 @@ h1 { font-size: clamp(54px, 8.1vw, 108px); line-height: .93; }
 .countdown-empty p, .countdown-event time { margin-top: 9px; color: #e1e6d8; font-size: 13px; line-height: 1.5; }
 .countdown-action { display: inline-block; margin-top: 20px; font-size: 13px; font-weight: 700; color: var(--leaf); }
 .countdown-event { display: flex; flex-direction: column; justify-content: center; }
-.countdown-select { max-width: 100%; min-width: 0; width: 100%; margin-bottom: 12px; padding: 7px 9px; border: 1px solid #ffffff50; border-radius: 8px; background: var(--pine); color: inherit; font: inherit; font-size: 13px; }
+.countdown-title { position: relative; align-self: flex-start; max-width: 100%; border-radius: 4px; }
+.countdown-title.can-select { padding-right: 25px; }
+.countdown-title.can-select::after { content: ''; position: absolute; right: 3px; top: 12px; width: 8px; height: 8px; border-right: 1.5px solid #c4de9a; border-bottom: 1.5px solid #c4de9a; transform: rotate(45deg); pointer-events: none; }
+.countdown-title.can-select:hover h3 { color: var(--leaf); }
+.countdown-title:focus-within { outline: 2px solid var(--leaf); outline-offset: 4px; }
+.countdown-select { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; font: inherit; font-size: 16px; }
 .countdown-error { color: #ffd9b7; font-size: 13px; }
 .countdown-error:not(:empty) { margin-top: 10px; }
 .countdown-mode { margin-bottom: 9px; color: var(--leaf); }

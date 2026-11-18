@@ -46,6 +46,7 @@ function readCountdown() {
   countdownSelect.replaceChildren(...events.map((event) => new Option(event.name, event.id)));
   countdownSelect.value = selectedEvent?.id ?? '';
   countdownSelect.hidden = events.length < 2;
+  byId('countdown-title-picker').classList.toggle('can-select', events.length > 1);
   byId('countdown-empty').hidden = Boolean(selectedEvent);
   byId('countdown-event').hidden = !selectedEvent;
   if (selectedEvent) {

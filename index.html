@@ -81,9 +81,11 @@
           <a class="countdown-action" href="https://www.davidbreyer.com/timeuntil/" target="_blank" rel="noopener">Go to Time Until <span role="img" aria-label="Opens in a new tab">↗</span></a>
         </div>
         <div class="countdown-event" id="countdown-event" hidden>
-          <select class="countdown-select" id="countdown-select" aria-label="Choose countdown" hidden></select>
           <p class="eyebrow countdown-mode" id="countdown-mode"></p>
-          <h3 id="event-name"></h3>
+          <div class="countdown-title" id="countdown-title-picker">
+            <h3 id="event-name"></h3>
+            <select class="countdown-select" id="countdown-select" aria-label="Choose countdown" hidden></select>
+          </div>
           <time id="event-date"></time>
           <dl class="countdown-units">
             <div><dt>Days</dt><dd id="days"></dd></div>
