@@ -23,14 +23,7 @@
   </header>
 
   <main class="shell">
-    <div class="dashboard-topline">
-      <h1 class="dashboard-date"><time id="today">Today</time></h1>
-      <div class="dashboard-awake-control">
-        <label class="dashboard-awake-toggle"><input type="checkbox" id="dashboard-keep-awake" role="switch" autocomplete="off" aria-describedby="dashboard-awake-status dashboard-awake-help"><span>Keep screen awake</span></label>
-        <span class="dashboard-awake-status" id="dashboard-awake-status" role="status">Off</span>
-        <span class="sr-only" id="dashboard-awake-help">Applies to the entire dashboard while this tab is visible. Starts off each time the page is reloaded.</span>
-      </div>
-    </div>
+    <h1 class="dashboard-date"><time id="today">Today</time></h1>
 
     <dialog class="card-settings" id="card-settings" aria-labelledby="card-settings-title">
       <form method="dialog">
@@ -297,6 +290,11 @@
         </a>
       </template>
     </section>
+    <div class="dashboard-awake-control">
+      <label class="dashboard-awake-toggle"><input type="checkbox" id="dashboard-keep-awake" role="switch" autocomplete="off" aria-describedby="dashboard-awake-status dashboard-awake-help"><span>Keep screen awake</span></label>
+      <span class="dashboard-awake-status" id="dashboard-awake-status" role="status">Off</span>
+      <span class="sr-only" id="dashboard-awake-help">Applies to the entire dashboard while this tab is visible. Starts off each time the page is reloaded.</span>
+    </div>
   </main>
 
   <footer class="shell site-footer">

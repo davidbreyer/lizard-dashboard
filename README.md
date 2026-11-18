@@ -21,7 +21,7 @@ The card updates when saved data changes, an event passes, or a new day starts.
 Its color picker shares Time Until's saved clock color and is included in that
 app's backup. Clock can be hidden and reordered like every other card.
 
-**Keep screen awake**, beside the dashboard date, applies to the whole dashboard
+**Keep screen awake**, at the bottom above the footer, applies to the whole dashboard
 even when Clock is hidden. It starts off on each page load. On supported secure
 browsers it holds a screen wake lock while the dashboard is visible, releases it
 when the page is hidden/left, and resumes on return if still enabled. Active,
