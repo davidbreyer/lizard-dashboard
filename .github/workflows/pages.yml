@@ -7,6 +7,8 @@ on:
       - 'index.html'
       - 'tools/**'
       - 'dashboard.js'
+      - 'backup*.mjs'
+      - 'tests/**'
       - 'styles.css'
       - 'lizard.png'
       - '.nojekyll'
@@ -37,6 +39,8 @@ jobs:
       - name: Build the versioned dashboard
         run: |
           node --check dashboard.js
+          node --check backup-ui.mjs
+          node --test tests/*.test.mjs
           node scripts/build-pages.mjs
       - name: Upload website
         uses: actions/upload-pages-artifact@v4

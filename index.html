@@ -28,15 +28,63 @@
     <dialog class="card-settings" id="card-settings" aria-labelledby="card-settings-title">
       <form method="dialog">
         <h2 id="card-settings-title">Dashboard cards</h2>
+        <p class="settings-hint">Choose your cards and use the arrows to arrange them.</p>
         <div class="card-choices">
-          <label><input type="checkbox" value="weather-card" checked> Weather Lizard</label>
-          <label><input type="checkbox" value="countdown-card" checked> Time Until</label>
-          <label><input type="checkbox" value="todo-card" checked> To Do Lizard</label>
-          <label><input type="checkbox" value="quiz-card" checked> Quiz Your Lizard</label>
+          <div class="card-choice" data-card="weather-card">
+            <label><input type="checkbox" value="weather-card" checked> Weather Lizard</label>
+            <div class="card-move"><button type="button" data-move="-1" aria-label="Move Weather Lizard up">↑</button><button type="button" data-move="1" aria-label="Move Weather Lizard down">↓</button></div>
+          </div>
+          <div class="card-choice" data-card="countdown-card">
+            <label><input type="checkbox" value="countdown-card" checked> Time Until</label>
+            <div class="card-move"><button type="button" data-move="-1" aria-label="Move Time Until up">↑</button><button type="button" data-move="1" aria-label="Move Time Until down">↓</button></div>
+          </div>
+          <div class="card-choice" data-card="todo-card">
+            <label><input type="checkbox" value="todo-card" checked> To Do Lizard</label>
+            <div class="card-move"><button type="button" data-move="-1" aria-label="Move To Do Lizard up">↑</button><button type="button" data-move="1" aria-label="Move To Do Lizard down">↓</button></div>
+          </div>
+          <div class="card-choice" data-card="quiz-card">
+            <label><input type="checkbox" value="quiz-card" checked> Quiz Your Lizard</label>
+            <div class="card-move"><button type="button" data-move="-1" aria-label="Move Quiz Your Lizard up">↑</button><button type="button" data-move="1" aria-label="Move Quiz Your Lizard down">↓</button></div>
+          </div>
         </div>
         <p class="card-settings-status" id="card-settings-status" role="status"></p>
-        <button type="submit" class="cards-button card-settings-done">Done</button>
+        <div class="settings-actions">
+          <button type="button" class="settings-link" data-open-backup>Backup &amp; restore</button>
+          <button type="submit" class="cards-button card-settings-done">Done</button>
+        </div>
       </form>
+    </dialog>
+
+    <dialog class="backup-dialog" id="backup-dialog" aria-labelledby="backup-title">
+      <div class="backup-heading">
+        <h2 id="backup-title">Backup &amp; restore</h2>
+        <button type="button" class="backup-close" id="backup-close" aria-label="Close backup and restore">×</button>
+      </div>
+      <p class="settings-hint">Keep your saved Lizard data together, or move it to another browser or device.</p>
+      <section class="backup-section" aria-labelledby="backup-saved-title">
+        <h3 id="backup-saved-title">Saved in this browser</h3>
+        <ul class="backup-inventory" id="backup-inventory"></ul>
+        <button type="button" class="cards-button backup-primary" id="backup-download">Download backup</button>
+      </section>
+      <section class="backup-section" aria-labelledby="backup-restore-title">
+        <h3 id="backup-restore-title">Restore a backup</h3>
+        <p class="settings-hint">Choose a Lizard Dashboard backup to preview its contents.</p>
+        <button type="button" class="cards-button" id="backup-choose">Choose backup file</button>
+        <input type="file" id="backup-file" accept=".json,application/json" hidden>
+        <div class="backup-preview" id="backup-preview" hidden>
+          <p class="backup-file-detail" id="backup-file-detail"></p>
+          <fieldset class="backup-app-choices">
+            <legend>Choose apps to restore</legend>
+            <div id="backup-app-choices"></div>
+          </fieldset>
+          <p class="settings-hint">This replaces the saved data for selected apps with the backup. Unchecked apps keep their current data.</p>
+          <button type="button" class="cards-button backup-primary" id="backup-restore" disabled>Restore selected apps</button>
+        </div>
+      </section>
+      <p class="backup-status" id="backup-status" role="status"></p>
+      <button type="button" class="settings-link" id="backup-recovery" hidden>Download recovery backup</button>
+      <p class="backup-note">Includes saved data from the Lizard apps on this site. Unsaved edits and large-file sessions aren't included. Reload other open Lizard tabs after restoring.</p>
+      <details class="backup-coverage"><summary>Which apps are covered?</summary><p>Dashboard, To Do, Time Until (including clock color), Quiz Your Lizard, Weather, Format, Format v2, Compare and Delim. Mock, Duplicate and DateTime don't currently save workspaces.</p></details>
     </dialog>
 
     <div class="widgets">
@@ -187,6 +235,7 @@
   <footer class="shell site-footer">
     <a href="https://www.davidbreyer.com/" target="_blank" rel="noopener">David Breyer <span role="img" aria-label="Opens in a new tab">↗</span></a>
     <div class="footer-meta">
+      <button type="button" class="settings-link" data-open-backup aria-haspopup="dialog" aria-controls="backup-dialog">Backup &amp; restore</button>
       <a href="https://www.weather.gov/" target="_blank" rel="noopener">Weather data from the National Weather Service <span role="img" aria-label="Opens in a new tab">↗</span></a>
       <span class="app-version">Version: <span id="app-version">development</span></span>
     </div>

@@ -16,10 +16,10 @@ const output = new URL('dist/', root);
 const markers = /(name="app-version" content="|id="app-version">|\?v=)development\b/g;
 
 mkdirSync(output, { recursive: true });
-for (const file of ['.nojekyll', 'dashboard.js', 'lizard.png', 'styles.css']) {
+for (const file of ['.nojekyll', 'lizard.png', 'styles.css']) {
   copyFileSync(new URL(file, root), new URL(file, output));
 }
-for (const file of ['index.html', 'tools/index.html']) {
+for (const file of ['index.html', 'tools/index.html', 'dashboard.js', 'backup.mjs', 'backup-ui.mjs']) {
   const source = readFileSync(new URL(file, root), 'utf8');
   const destination = new URL(file, output);
   mkdirSync(new URL('.', destination), { recursive: true });

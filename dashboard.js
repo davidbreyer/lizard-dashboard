@@ -1,8 +1,13 @@
+import { CARD_IDS, normalizeCardOrder } from './backup.mjs?v=development';
+import { initBackup } from './backup-ui.mjs?v=development';
+
 const byId = (id) => document.getElementById(id);
 const countdownKey = 'timeuntil.events.v1';
 const quizKey = 'quiz-your-lizard:v1';
 const todoKey = 'todo-lizard:v1';
 const hiddenCardsKey = 'lizard-dashboard.hidden-cards.v1';
+const cardOrderKey = 'lizard-dashboard.card-order.v1';
+let cardOrder = [...CARD_IDS];
 const cardSettings = byId('card-settings');
 const cardChoices = [...cardSettings.querySelectorAll('input[type="checkbox"]')];
 const weatherCard = byId('weather-card');
@@ -316,6 +321,7 @@ const retryButton = byId('weather-refresh');
 let activeLocation = readWeatherLocation() ?? defaultLocation;
 let weatherLoadedAt = 0;
 let weatherBusy = false;
+let weatherRequest = 0;
 
 function approximateWeatherLocation(coords) {
   const { latitude, longitude } = coords ?? {};
@@ -414,6 +420,7 @@ function locateUser() {
 
 async function updateWeather(mode = 'refresh') {
   if (weatherBusy || weatherCard.hidden) return;
+  const request = ++weatherRequest;
   weatherBusy = locationButton.disabled = defaultButton.disabled = retryButton.disabled = true;
   const status = byId('weather-status');
   retryButton.hidden = true;
@@ -429,6 +436,7 @@ async function updateWeather(mode = 'refresh') {
   try {
     if (locating) {
       location = approximateWeatherLocation(await locateUser());
+      if (request !== weatherRequest) return;
       if (!location) throw new Error('Invalid location.');
       status.textContent = 'Loading forecast…';
     }
@@ -445,19 +453,34 @@ async function updateWeather(mode = 'refresh') {
     if (!periods.some(({ endTime, temperature }) => Date.parse(endTime) > Date.now() && Number.isFinite(temperature))) {
       throw new Error('Hourly forecast empty.');
     }
+    if (request !== weatherRequest) return;
     renderWeather(properties, periods, location.label || placeName(properties), observation, alerts);
     activeLocation = location;
     weatherLoadedAt = Date.now();
     if (mode === 'locate') preferenceSaved = saveWeatherLocation(location);
     status.textContent = preferenceSaved ? '' : 'Could not save the location change in this browser.';
   } catch {
+    if (request !== weatherRequest) return;
     const error = locating ? 'Could not use your location.' : 'Could not load the forecast.';
     status.textContent = weatherLoadedAt ? `${error} Showing the last forecast.` : error;
     retryButton.hidden = locating && Boolean(weatherLoadedAt);
   } finally {
-    defaultButton.hidden = activeLocation === defaultLocation;
-    weatherBusy = locationButton.disabled = defaultButton.disabled = retryButton.disabled = false;
+    if (request === weatherRequest) {
+      defaultButton.hidden = activeLocation === defaultLocation;
+      weatherBusy = locationButton.disabled = defaultButton.disabled = retryButton.disabled = false;
+    }
   }
+}
+
+function refreshSavedWeather() {
+  weatherRequest++;
+  weatherBusy = locationButton.disabled = defaultButton.disabled = retryButton.disabled = false;
+  activeLocation = readWeatherLocation() ?? defaultLocation;
+  weatherLoadedAt = 0;
+  byId('weather-reading').hidden = true;
+  byId('weather-alerts').hidden = true;
+  byId('weather-place').textContent = activeLocation.label || 'Saved location';
+  updateWeather();
 }
 
 function refreshWeatherIfStale() {
@@ -466,7 +489,21 @@ function refreshWeatherIfStale() {
 
 function applyCardVisibility() {
   const weatherWasHidden = weatherCard.hidden;
-  const visible = cardChoices.filter((choice) => choice.checked);
+  const orderedChoices = cardOrder.map(id => cardChoices.find(choice => choice.value === id));
+  const widgets = document.querySelector('.widgets');
+  const choices = document.querySelector('.card-choices');
+  if ([...widgets.children].map(card => card.id).join() !== cardOrder.join()) {
+    widgets.append(...cardOrder.map(byId));
+  }
+  if ([...choices.children].map(row => row.dataset.card).join() !== cardOrder.join()) {
+    choices.append(...cardOrder.map(id => choices.querySelector('[data-card="' + id + '"]')));
+  }
+  for (const [index, id] of cardOrder.entries()) {
+    const row = choices.querySelector('[data-card="' + id + '"]');
+    row.querySelector('[data-move="-1"]').disabled = index === 0;
+    row.querySelector('[data-move="1"]').disabled = index === cardOrder.length - 1;
+  }
+  const visible = orderedChoices.filter((choice) => choice.checked);
   const wideCard = visible.length % 2 === 1 ? visible.at(-1) : null;
   for (const choice of cardChoices) {
     const card = byId(choice.value);
@@ -485,15 +522,38 @@ function readCardVisibility() {
     saved = [];
   }
   const hidden = Array.isArray(saved) ? saved : [];
+  try { cardOrder = normalizeCardOrder(JSON.parse(localStorage.getItem(cardOrderKey))); }
+  catch { cardOrder = [...CARD_IDS]; }
   for (const choice of cardChoices) choice.checked = !hidden.includes(choice.value);
   applyCardVisibility();
 }
 
+function moveCard(button) {
+  const id = button.closest('.card-choice').dataset.card;
+  const index = cardOrder.indexOf(id);
+  const destination = index + Number(button.dataset.move);
+  if (destination < 0 || destination >= cardOrder.length) return;
+  [cardOrder[index], cardOrder[destination]] = [cardOrder[destination], cardOrder[index]];
+  applyCardVisibility();
+  const status = byId('card-settings-status');
+  try {
+    localStorage.setItem(cardOrderKey, JSON.stringify(cardOrder));
+    status.textContent = byId(id).querySelector('h2').textContent + ' moved to position ' + (destination + 1) + ' of ' + cardOrder.length + '.';
+    status.classList.remove('is-error');
+  } catch {
+    status.textContent = 'Order changed for this visit, but could not be saved in this browser.';
+    status.classList.add('is-error');
+  }
+  const focus = button.disabled ? button.parentElement.querySelector('button:not(:disabled)') : button;
+  focus?.focus();
+}
+
 window.addEventListener('storage', ({ key }) => {
-  if (key === hiddenCardsKey || key === null) readCardVisibility();
+  if (key === hiddenCardsKey || key === cardOrderKey || key === null) readCardVisibility();
   if (key === countdownKey || key === null) readCountdown();
   if (key === quizKey || key === null) readQuizSummary();
   if (key === todoKey || key === null) readTodoSummary();
+  if (key === weatherLocationKey || key === null) refreshSavedWeather();
 });
 window.addEventListener('pageshow', () => {
   readCountdown();
@@ -504,6 +564,10 @@ window.addEventListener('pageshow', () => {
 document.addEventListener('visibilitychange', refreshWeatherIfStale);
 countdownSelect.addEventListener('change', selectCountdown);
 byId('cards-button').addEventListener('click', () => cardSettings.showModal());
+cardSettings.addEventListener('click', event => {
+  const button = event.target.closest('[data-move]');
+  if (button) moveCard(button);
+});
 cardSettings.addEventListener('change', () => {
   applyCardVisibility();
   const status = byId('card-settings-status');
@@ -511,8 +575,10 @@ cardSettings.addEventListener('change', () => {
     const hidden = cardChoices.filter((choice) => !choice.checked).map((choice) => choice.value);
     localStorage.setItem(hiddenCardsKey, JSON.stringify(hidden));
     status.textContent = '';
+    status.classList.remove('is-error');
   } catch {
     status.textContent = 'Could not save your card choices in this browser.';
+    status.classList.add('is-error');
   }
 });
 todoAddToggle.addEventListener('click', () => setTodoAddOpen(todoAddForm.hidden));
@@ -527,6 +593,14 @@ todoAddForm.addEventListener('keydown', (event) => {
 locationButton.addEventListener('click', () => updateWeather('locate'));
 defaultButton.addEventListener('click', () => updateWeather('default'));
 retryButton.addEventListener('click', () => updateWeather());
+
+initBackup({ onRestore(keys) {
+  if (keys.includes(hiddenCardsKey) || keys.includes(cardOrderKey)) readCardVisibility();
+  if (keys.includes(countdownKey)) readCountdown();
+  if (keys.includes(quizKey)) readQuizSummary();
+  if (keys.includes(todoKey)) readTodoSummary();
+  if (keys.includes(weatherLocationKey)) refreshSavedWeather();
+} });
 
 readCardVisibility();
 readCountdown();
