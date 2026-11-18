@@ -2,6 +2,7 @@ const json = JSON.stringify;
 export const fixtures = {
   'lizard-dashboard.hidden-cards.v1': json(['weather-card']),
   'lizard-dashboard.card-order.v1': json(['todo-card', 'quiz-card', 'countdown-card', 'weather-card']),
+  'lizard-dashboard.recent-tools.v1': json(['delim-lizard', 'compare-lizard', 'format-lizard']),
   'todo-lizard:v1': json([{ id: 't1', title: 'Back up the planner', dueDate: '2028-02-29', priority: 'high', completed: false, createdAt: '2026-11-18T12:00:00Z', completedAt: null }]),
   'todo-lizard:settings:v1': json({ filter: 'active', sort: 'due', search: '' }),
   'timeuntil.events.v1': json({ events: [{ id: 'e1', name: 'Holiday', target: '2026-12-25T12:00:00.000Z', color: 'gold' }], selected: 'e1' }),

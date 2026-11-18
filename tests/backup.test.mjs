@@ -23,7 +23,7 @@ test('exports only audited keys and exactly preserves all nine app snapshots', (
   const source = new Storage({ ...fixtures, unrelated: 'leave me alone', 'future-app.secret': 'private' });
   const data = backup(source);
   assert.equal(Object.keys(data.apps).length, 9);
-  assert.equal(Object.values(data.apps).flatMap(Object.keys).length, 12);
+  assert.equal(Object.values(data.apps).flatMap(Object.keys).length, 13);
   assert(!json(data).includes('leave me alone'));
   const destination = new Storage({ unrelated: 'untouched' });
   restoreBackup(destination, parseBackup(json(data)), Object.keys(data.apps));
@@ -144,4 +144,20 @@ test('existing card layouts gain Upcoming without changing their saved order or 
   assert.equal(target.getItem('lizard-dashboard.card-order.v1'), json(['upcoming-card', ...oldOrder]));
   assert.equal(target.getItem('lizard-dashboard.hidden-cards.v1'), '["upcoming-card"]');
   assert.equal(target.getItem('todo-lizard:v1'), fixtures['todo-lizard:v1']);
+});
+
+test('recent tools round-trip with Dashboard preferences and older backups leave history alone', () => {
+  const target = new Storage(fixtures);
+  const older = parsed();
+  delete older.apps.dashboard['lizard-dashboard.recent-tools.v1'];
+  restoreBackup(target, older, ['dashboard']);
+  assert.equal(target.getItem('lizard-dashboard.recent-tools.v1'), fixtures['lizard-dashboard.recent-tools.v1']);
+  const fresh = parsed();
+  fresh.apps.dashboard['lizard-dashboard.recent-tools.v1'] = '["mock-lizard","datetime-lizard"]';
+  restoreBackup(target, fresh, ['dashboard']);
+  assert.equal(target.getItem('lizard-dashboard.recent-tools.v1'), '["mock-lizard","datetime-lizard"]');
+  fresh.apps.dashboard['lizard-dashboard.recent-tools.v1'] = '["todo-lizard"]';
+  const before = target.snapshot();
+  assert.throws(() => restoreBackup(target, fresh, ['dashboard']), /invalid or unsupported/);
+  assert.deepEqual(target.snapshot(), before);
 });

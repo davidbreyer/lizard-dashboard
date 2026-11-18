@@ -1,6 +1,7 @@
 import { CARD_IDS, normalizeCardOrder } from './backup.mjs?v=development';
 import { initBackup } from './backup-ui.mjs?v=development';
 import { buildUpcoming } from './upcoming.mjs?v=development';
+import { RECENT_TOOLS_KEY, refreshRecentTools } from './recent-tools.mjs?v=development';
 
 const byId = (id) => document.getElementById(id);
 const countdownKey = 'timeuntil.events.v1';
@@ -691,6 +692,7 @@ byId('upcoming-more').addEventListener('click', () => {
 });
 
 initBackup({ onRestore(keys) {
+  if (keys.includes(RECENT_TOOLS_KEY)) refreshRecentTools();
   if (keys.includes(hiddenCardsKey) || keys.includes(cardOrderKey)) readCardVisibility();
   if (keys.includes(countdownKey)) readCountdown();
   if (keys.includes(quizKey)) readQuizSummary();

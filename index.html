@@ -235,7 +235,8 @@
         <h2 id="tools-title">Lizard Tools</h2>
         <a class="tool-directory" href="tools/">View all tools <span aria-hidden="true">→</span></a>
       </div>
-      <div class="tool-links">
+      <p class="recent-tools-note"><span id="recent-tools-status" role="status">Open a tool here or in the directory to build your recent list.</span><button type="button" class="settings-link" id="recent-tools-clear" hidden>Clear history</button></p>
+      <div class="tool-links" id="recent-tools">
         <a class="tool" href="https://www.davidbreyer.com/compare-lizard/" target="_blank" rel="noopener">
           <span class="tool-icon" aria-hidden="true">±</span>
           <span><strong>Compare Lizard</strong><small>Compare JSON and XML side by side.</small></span>
@@ -252,6 +253,13 @@
           <span class="tool-arrow" role="img" aria-label="Opens in a new tab">↗</span>
         </a>
       </div>
+      <template id="recent-tool-template">
+        <a class="tool" target="_blank" rel="noopener">
+          <span class="tool-icon" aria-hidden="true"></span>
+          <span><strong></strong><small></small></span>
+          <span class="tool-arrow" role="img" aria-label="Opens in a new tab">↗</span>
+        </a>
+      </template>
     </section>
   </main>
 

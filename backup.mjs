@@ -1,9 +1,11 @@
+import { RECENT_TOOLS_KEY, validRecentTools } from './recent-tools.mjs?v=development';
+
 // Storage contracts audited against the Lizard apps in November 2026.
 // Values stay as their original strings so a backup preserves every saved field.
 export const CARD_IDS = ['weather-card', 'countdown-card', 'todo-card', 'quiz-card', 'upcoming-card'];
 export const MAX_BACKUP_BYTES = 32 * 1024 * 1024;
 export const BACKUP_APPS = [
-  { id: 'dashboard', name: 'Dashboard', keys: ['lizard-dashboard.hidden-cards.v1', 'lizard-dashboard.card-order.v1'], detail: 'Card choices and order' },
+  { id: 'dashboard', name: 'Dashboard', keys: ['lizard-dashboard.hidden-cards.v1', 'lizard-dashboard.card-order.v1', RECENT_TOOLS_KEY], detail: 'Card choices, order and recent tools' },
   { id: 'todo', name: 'To Do Lizard', keys: ['todo-lizard:v1', 'todo-lizard:settings:v1'], detail: 'Tasks and list preferences' },
   { id: 'timeuntil', name: 'Time Until', keys: ['timeuntil.events.v1', 'timeuntil.clock.color.v1'], detail: 'Countdowns and clock color' },
   { id: 'quiz', name: 'Quiz Your Lizard', keys: ['quiz-your-lizard:v1'], detail: 'Quiz library, settings and practice history' },
@@ -57,6 +59,8 @@ function validValue(key, raw) {
   try { value = JSON.parse(raw); } catch { return false; }
   if (key === 'format-lizard.workspace.v2' && raw.length > 1024 * 1024) return false;
   switch (key) {
+    case RECENT_TOOLS_KEY:
+      return validRecentTools(value);
     case 'lizard-dashboard.hidden-cards.v1':
     case 'lizard-dashboard.card-order.v1':
       return Array.isArray(value) && value.every(id => CARD_IDS.includes(id)) && unique(value);

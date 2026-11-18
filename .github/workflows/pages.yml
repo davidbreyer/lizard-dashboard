@@ -9,6 +9,7 @@ on:
       - 'dashboard.js'
       - 'backup*.mjs'
       - 'upcoming.mjs'
+      - 'recent-tools.mjs'
       - 'tests/**'
       - 'styles.css'
       - 'lizard.png'

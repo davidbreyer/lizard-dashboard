@@ -19,7 +19,7 @@ mkdirSync(output, { recursive: true });
 for (const file of ['.nojekyll', 'lizard.png', 'styles.css']) {
   copyFileSync(new URL(file, root), new URL(file, output));
 }
-for (const file of ['index.html', 'tools/index.html', 'dashboard.js', 'backup.mjs', 'backup-ui.mjs', 'upcoming.mjs']) {
+for (const file of ['index.html', 'tools/index.html', 'dashboard.js', 'backup.mjs', 'backup-ui.mjs', 'upcoming.mjs', 'recent-tools.mjs']) {
   const source = readFileSync(new URL(file, root), 'utf8');
   const destination = new URL(file, output);
   mkdirSync(new URL('.', destination), { recursive: true });

@@ -5,6 +5,12 @@ The dashboard reads saved Lizard app data from the same browser and origin.
 Use **Cards** to show, hide and reorder the dashboard cards. The arrow buttons work
 with a keyboard or on a phone. Card choices and order are remembered locally.
 
+The tools section shows up to three tools most recently opened from the dashboard
+or its Tools directory, newest first. Until the first launch it shows the original
+Compare, Format and Mock shortcuts. Reopening a tool moves it to the front;
+Clear history resets these shortcuts. History consists only of up to six tool
+identifiers in this browser, and is included with Dashboard preferences in backups.
+
 **Upcoming** combines open tasks with due dates and future Time Until events,
 grouped by local calendar date. Its rolling seven-day window includes today and
 the next six days. It initially shows six items, with Show all for busy weeks.
