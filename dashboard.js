@@ -410,7 +410,7 @@ const daypartNodes = [...document.querySelectorAll('#dayparts li')].map((item) =
   ({ temperature: item.querySelector('strong'), condition: item.querySelector('small') }));
 const locationButton = byId('weather-location');
 const defaultButton = byId('weather-default');
-const retryButton = byId('weather-refresh');
+const refreshButton = byId('weather-refresh');
 let activeLocation = readWeatherLocation() ?? defaultLocation;
 let weatherLoadedAt = 0;
 let weatherBusy = false;
@@ -442,7 +442,7 @@ function saveWeatherLocation(location) {
 }
 
 async function requestWeather(url) {
-  const response = await fetch(url, { headers: { Accept: 'application/geo+json' }, signal: AbortSignal.timeout(10000) });
+  const response = await fetch(url, { headers: { Accept: 'application/geo+json' }, cache: 'no-cache', signal: AbortSignal.timeout(10000) });
   if (!response.ok) throw new Error(`Forecast service returned ${response.status}.`);
   return response.json();
 }
@@ -514,9 +514,8 @@ function locateUser() {
 async function updateWeather(mode = 'refresh') {
   if (weatherBusy || weatherCard.hidden) return;
   const request = ++weatherRequest;
-  weatherBusy = locationButton.disabled = defaultButton.disabled = retryButton.disabled = true;
+  weatherBusy = locationButton.disabled = defaultButton.disabled = refreshButton.disabled = true;
   const status = byId('weather-status');
-  retryButton.hidden = true;
   let locating = mode === 'locate';
   let preferenceSaved = true;
   if (mode === 'default') {
@@ -556,18 +555,17 @@ async function updateWeather(mode = 'refresh') {
     if (request !== weatherRequest) return;
     const error = locating ? 'Could not use your location.' : 'Could not load the forecast.';
     status.textContent = weatherLoadedAt ? `${error} Showing the last forecast.` : error;
-    retryButton.hidden = locating && Boolean(weatherLoadedAt);
   } finally {
     if (request === weatherRequest) {
       defaultButton.hidden = activeLocation === defaultLocation;
-      weatherBusy = locationButton.disabled = defaultButton.disabled = retryButton.disabled = false;
+      weatherBusy = locationButton.disabled = defaultButton.disabled = refreshButton.disabled = false;
     }
   }
 }
 
 function refreshSavedWeather() {
   weatherRequest++;
-  weatherBusy = locationButton.disabled = defaultButton.disabled = retryButton.disabled = false;
+  weatherBusy = locationButton.disabled = defaultButton.disabled = refreshButton.disabled = false;
   activeLocation = readWeatherLocation() ?? defaultLocation;
   weatherLoadedAt = 0;
   byId('weather-reading').hidden = true;
@@ -685,7 +683,7 @@ todoAddForm.addEventListener('keydown', (event) => {
 });
 locationButton.addEventListener('click', () => updateWeather('locate'));
 defaultButton.addEventListener('click', () => updateWeather('default'));
-retryButton.addEventListener('click', () => updateWeather());
+refreshButton.addEventListener('click', () => updateWeather());
 byId('upcoming-more').addEventListener('click', () => {
   upcomingExpanded = !upcomingExpanded;
   readUpcoming();
