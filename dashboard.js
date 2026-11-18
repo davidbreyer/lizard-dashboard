@@ -20,16 +20,22 @@ const todoAddTitle = byId('todo-add-title');
 const todoAddError = byId('todo-add-error');
 const units = ['days', 'hours', 'minutes', 'seconds'];
 const unitNodes = units.map(byId);
+const countdownSelect = byId('countdown-select');
 let selectedEvent;
 let displayedDate;
 
+function savedCountdowns(state) {
+  return Array.isArray(state?.events) ? state.events.filter((event) =>
+    typeof event?.id === 'string' && typeof event.name === 'string' && event.name.trim() &&
+    typeof event.target === 'string' && Number.isFinite(Date.parse(event.target))) : [];
+}
+
 function readCountdown() {
   let storageUnavailable = false;
+  let events = [];
   try {
     const state = JSON.parse(localStorage.getItem(countdownKey));
-    const events = Array.isArray(state?.events) ? state.events.filter((event) =>
-      typeof event?.id === 'string' && typeof event.name === 'string' && event.name.trim() &&
-      typeof event.target === 'string' && Number.isFinite(Date.parse(event.target))) : [];
+    events = savedCountdowns(state);
     const event = events.find(({ id }) => id === state?.selected) ?? events[0];
     selectedEvent = event && { ...event, timestamp: Date.parse(event.target) };
   } catch {
@@ -37,6 +43,9 @@ function readCountdown() {
     storageUnavailable = true;
   }
 
+  countdownSelect.replaceChildren(...events.map((event) => new Option(event.name, event.id)));
+  countdownSelect.value = selectedEvent?.id ?? '';
+  countdownSelect.hidden = events.length < 2;
   byId('countdown-empty').hidden = Boolean(selectedEvent);
   byId('countdown-event').hidden = !selectedEvent;
   if (selectedEvent) {
@@ -48,6 +57,22 @@ function readCountdown() {
     byId('countdown-help').textContent = storageUnavailable ? 'Open Time Until to check your saved events.' : 'Add or import a countdown in Time Until using this browser.';
   }
   tick();
+}
+
+function selectCountdown() {
+  const id = countdownSelect.value;
+  const error = byId('countdown-error');
+  error.textContent = '';
+  try {
+    const state = JSON.parse(localStorage.getItem(countdownKey));
+    if (!savedCountdowns(state).some((event) => event.id === id)) {
+      throw new Error('Countdown no longer available.');
+    }
+    localStorage.setItem(countdownKey, JSON.stringify({ ...state, selected: id }));
+  } catch {
+    error.textContent = 'Could not save the countdown selection. Try again.';
+  }
+  readCountdown();
 }
 
 function tick() {
@@ -86,6 +111,9 @@ function validDueDate(value) {
 function renderTodoTask(task, today) {
   const row = byId('todo-task-template').content.firstElementChild.cloneNode(true);
   row.querySelector('.todo-task-name').textContent = task.title;
+  const checkbox = row.querySelector('.todo-task-check');
+  checkbox.setAttribute('aria-label', `Complete ${task.title}`);
+  checkbox.addEventListener('change', () => completeTodoTask(task.source, checkbox));
   row.querySelector('.todo-task-priority').hidden = task.priority !== 'high';
   if (task.dueDate) {
     const date = row.querySelector('.todo-task-due');
@@ -103,6 +131,30 @@ function readTodoTasks() {
   const tasks = JSON.parse(localStorage.getItem(todoKey) ?? '[]');
   if (!Array.isArray(tasks)) throw new Error('Unsupported task data.');
   return tasks;
+}
+
+function completeTodoTask(source, checkbox) {
+  const error = byId('todo-complete-error');
+  error.textContent = '';
+  try {
+    const tasks = readTodoTasks();
+    const task = tasks.find((task) => typeof source.id === 'string' && source.id
+      ? task?.id === source.id
+      : JSON.stringify(task) === JSON.stringify(source));
+    if (!task) throw new Error('Task no longer available.');
+    if (!task.completed) {
+      task.completed = true;
+      task.completedAt = new Date().toISOString();
+      localStorage.setItem(todoKey, JSON.stringify(tasks));
+    }
+  } catch {
+    checkbox.checked = false;
+    error.textContent = 'Could not complete the task. Try again.';
+    return;
+  }
+  const keepFocus = document.activeElement === checkbox;
+  readTodoSummary();
+  if (keepFocus) (byId('todo-list').querySelector('input') ?? todoAddToggle).focus();
 }
 
 function setTodoAddOpen(isOpen) {
@@ -166,6 +218,7 @@ function readTodoSummary() {
   }
 
   const open = tasks.filter((task) => !task.completed).map((task) => ({
+    source: task,
     title: task.title.trim(),
     dueDate: validDueDate(task.dueDate),
     priority: taskPriority.includes(task.priority) ? task.priority : 'normal',
@@ -428,6 +481,7 @@ window.addEventListener('pageshow', () => {
   refreshWeatherIfStale();
 });
 document.addEventListener('visibilitychange', refreshWeatherIfStale);
+countdownSelect.addEventListener('change', selectCountdown);
 byId('cards-button').addEventListener('click', () => cardSettings.showModal());
 cardSettings.addEventListener('change', () => {
   applyCardVisibility();

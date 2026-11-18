@@ -81,6 +81,7 @@
           <a class="countdown-action" href="https://www.davidbreyer.com/timeuntil/" target="_blank" rel="noopener">Go to Time Until <span role="img" aria-label="Opens in a new tab">↗</span></a>
         </div>
         <div class="countdown-event" id="countdown-event" hidden>
+          <select class="countdown-select" id="countdown-select" aria-label="Choose countdown" hidden></select>
           <p class="eyebrow countdown-mode" id="countdown-mode"></p>
           <h3 id="event-name"></h3>
           <time id="event-date"></time>
@@ -90,6 +91,7 @@
             <div><dt>Minutes</dt><dd id="minutes"></dd></div>
             <div><dt>Seconds</dt><dd id="seconds"></dd></div>
           </dl>
+          <p class="countdown-error" id="countdown-error" role="status"></p>
         </div>
       </section>
       <section class="widget todo" id="todo-card" aria-labelledby="todo-title">
@@ -112,9 +114,10 @@
           </form>
           <p class="todo-status" id="todo-status" role="status">No tasks saved in this browser yet</p>
           <ul class="todo-list" id="todo-list" aria-label="Open tasks" hidden></ul>
+          <p class="todo-add-error" id="todo-complete-error" role="status"></p>
           <template id="todo-task-template">
             <li>
-              <span class="todo-task-name"></span>
+              <label class="todo-task-label"><input type="checkbox" class="todo-task-check"><span class="todo-task-name"></span></label>
               <div class="todo-task-details">
                 <span class="todo-task-priority" hidden>High priority</span>
                 <time class="todo-task-due" hidden></time>

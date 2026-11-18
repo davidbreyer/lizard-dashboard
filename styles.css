@@ -113,6 +113,9 @@ h1 { font-size: clamp(54px, 8.1vw, 108px); line-height: .93; }
 .countdown-empty p, .countdown-event time { margin-top: 9px; color: #e1e6d8; font-size: 13px; line-height: 1.5; }
 .countdown-action { display: inline-block; margin-top: 20px; font-size: 13px; font-weight: 700; color: var(--leaf); }
 .countdown-event { display: flex; flex-direction: column; justify-content: center; }
+.countdown-select { max-width: 100%; min-width: 0; width: 100%; margin-bottom: 12px; padding: 7px 9px; border: 1px solid #ffffff50; border-radius: 8px; background: var(--pine); color: inherit; font: inherit; font-size: 13px; }
+.countdown-error { color: #ffd9b7; font-size: 13px; }
+.countdown-error:not(:empty) { margin-top: 10px; }
 .countdown-mode { margin-bottom: 9px; color: var(--leaf); }
 .countdown-units { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin-top: 24px; }
 .countdown-units div { display: flex; flex-direction: column-reverse; align-items: center; justify-content: center; padding: 8px 3px; background: #ffffff10; border-radius: 11px; }
@@ -136,7 +139,9 @@ h1 { font-size: clamp(54px, 8.1vw, 108px); line-height: .93; }
 .todo-list { margin: 9px 0 0; padding: 0; list-style: none; }
 .todo-list li { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; padding: 10px 0; border-top: 1px solid #e7dbc7; }
 .todo-list li:last-child { padding-bottom: 0; }
-.todo-task-name { flex: 1 1 180px; min-width: 0; font-size: 15px; font-weight: 600; overflow-wrap: anywhere; }
+.todo-task-label { display: flex; align-items: baseline; gap: 9px; flex: 1 1 180px; min-width: 0; cursor: pointer; }
+.todo-task-check { flex-shrink: 0; width: 17px; height: 17px; margin: 0; align-self: center; accent-color: var(--pine); cursor: pointer; }
+.todo-task-name { min-width: 0; font-size: 15px; font-weight: 600; overflow-wrap: anywhere; }
 .todo-task-details { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 9px; color: #63503a; font-size: 12px; }
 .todo-task-priority, .todo-task-due.is-overdue { color: #863822; font-weight: 700; }
 .quiz { background: #f3eff5; border: 1px solid #ded6e3; }
