@@ -250,7 +250,7 @@ h1 { font-size: clamp(54px, 8.1vw, 108px); line-height: .93; }
 .site-footer { border-top: 1px solid var(--line); padding-block: 20px 26px; font-size: 12px; color: var(--muted); }
 .site-footer a { text-decoration: none; }
 .site-footer a:hover { text-decoration: underline; }
-.footer-meta { display: flex; flex-wrap: wrap; gap: 8px 18px; }
+.footer-meta { display: flex; flex-wrap: wrap; align-items: baseline; min-width: 0; gap: 8px 18px; }
 .app-version { white-space: nowrap; font-variant-numeric: tabular-nums; }
 
 @media (max-width: 850px) {
@@ -274,10 +274,14 @@ h1 { font-size: clamp(54px, 8.1vw, 108px); line-height: .93; }
   .quiz-metrics div { flex: 1; min-width: 0; }
   .dayparts li, .dayparts li:first-child { padding-inline: 8px; }
   .dayparts li:first-child { padding-left: 12px; }
-  .site-footer { align-items: flex-start; flex-direction: column; gap: 8px; }
 }
 
 @media (max-width: 620px) {
+  .site-footer { flex-direction: column; align-items: flex-start; gap: 12px; padding-block: 24px 32px; font-size: 13px; line-height: 1.6; }
+  .footer-meta { flex-direction: column; align-items: flex-start; gap: 12px; width: 100%; }
+  .site-footer a, .site-footer .settings-link { max-width: 100%; }
+  .site-footer .settings-link { padding-block: 5px; }
+  .site-footer .app-version { font-size: 12px; }
   .tool-links.directory-links { grid-template-columns: 1fr; }
   .directory-links .tool { min-height: 75px; }
 }
