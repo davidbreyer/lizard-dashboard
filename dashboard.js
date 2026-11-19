@@ -148,6 +148,7 @@ function validDueDate(value) {
 
 function renderTodoTask(task, today) {
   const row = byId('todo-task-template').content.firstElementChild.cloneNode(true);
+  if (task.source.id) row.dataset.taskId = task.source.id;
   row.querySelector('.todo-task-name').textContent = task.title;
   const checkbox = row.querySelector('.todo-task-check');
   checkbox.setAttribute('aria-label', `Complete ${task.title}`);
@@ -180,6 +181,58 @@ function readTodoTasks() {
   return tasks;
 }
 
+const undoNotice = byId('todo-undo');
+const undoButton = byId('todo-undo-button');
+let pendingCompletion = null;
+let undoTimeout;
+
+function dismissTaskUndo() {
+  clearTimeout(undoTimeout);
+  pendingCompletion = null;
+  undoNotice.hidden = true;
+}
+
+function scheduleUndoDismissal() {
+  clearTimeout(undoTimeout);
+  if (pendingCompletion && document.activeElement !== undoButton) {
+    undoTimeout = setTimeout(dismissTaskUndo, 10000);
+  }
+}
+
+function undoTaskCompletion() {
+  if (!pendingCompletion) return;
+  const { before, completedAt } = pendingCompletion;
+  const error = byId('todo-complete-error');
+  try {
+    const tasks = readTodoTasks();
+    const matches = tasks.filter(task => task?.completed === true && task.completedAt === completedAt &&
+      (before.id ? task.id === before.id : JSON.stringify(task) === pendingCompletion.legacyRecord));
+    if (matches.length !== 1) {
+      dismissTaskUndo();
+      readTodoSummary();
+      error.textContent = 'This task changed elsewhere. Undo is no longer available.';
+      todoAddToggle.focus();
+      return;
+    }
+    // Revert just the completion fields, retaining any later edits to this task or its neighbors.
+    const task = matches[0];
+    for (const field of ['completed', 'completedAt']) {
+      if (Object.hasOwn(before, field)) task[field] = before[field];
+      else delete task[field];
+    }
+    localStorage.setItem(todoKey, JSON.stringify(tasks));
+    dismissTaskUndo();
+    readTodoSummary();
+    error.textContent = '';
+    const rows = [...byId('todo-list').children];
+    const restoredRow = rows.find(row => before.id ? row.dataset.taskId === before.id :
+      row.querySelector('.todo-task-name').textContent === task.title.trim());
+    (restoredRow?.querySelector('input') ?? todoAddToggle).focus();
+  } catch {
+    error.textContent = 'Could not undo completion. Try again.';
+  }
+}
+
 function completeTodoTask(source, checkbox) {
   const error = byId('todo-complete-error');
   error.textContent = '';
@@ -190,9 +243,15 @@ function completeTodoTask(source, checkbox) {
       : JSON.stringify(task) === JSON.stringify(source));
     if (!task) throw new Error('Task no longer available.');
     if (!task.completed) {
+      const before = { ...task };
       task.completed = true;
       task.completedAt = new Date().toISOString();
       localStorage.setItem(todoKey, JSON.stringify(tasks));
+      pendingCompletion = { before, completedAt: task.completedAt, legacyRecord: before.id ? null : JSON.stringify(task) };
+      undoNotice.hidden = false;
+      byId('todo-undo-message').textContent = 'Completed “' + task.title + '”';
+      undoButton.setAttribute('aria-label', 'Undo completion of ' + task.title);
+      scheduleUndoDismissal();
     }
   } catch {
     checkbox.checked = false;
@@ -758,6 +817,9 @@ cardSettings.addEventListener('change', () => {
   }
 });
 todoAddToggle.addEventListener('click', () => setTodoAddOpen(todoAddForm.hidden));
+undoButton.addEventListener('click', undoTaskCompletion);
+undoButton.addEventListener('focus', () => clearTimeout(undoTimeout));
+undoButton.addEventListener('blur', scheduleUndoDismissal);
 byId('todo-add-cancel').addEventListener('click', () => setTodoAddOpen(false));
 todoAddForm.addEventListener('submit', addTodoTask);
 todoAddTitle.addEventListener('input', () => { todoAddError.textContent = ''; });

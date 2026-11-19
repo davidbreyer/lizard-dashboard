@@ -181,6 +181,10 @@
           </form>
           <p class="todo-status" id="todo-status" role="status">No tasks saved in this browser yet</p>
           <ul class="todo-list" id="todo-list" aria-label="Open tasks" hidden></ul>
+          <div class="todo-undo" id="todo-undo" hidden>
+            <span id="todo-undo-message" role="status"></span>
+            <button type="button" class="todo-quick-button" id="todo-undo-button">Undo</button>
+          </div>
           <p class="todo-add-error" id="todo-complete-error" role="status"></p>
           <template id="todo-task-template">
             <li>
