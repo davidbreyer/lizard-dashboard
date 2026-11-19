@@ -19,11 +19,11 @@ const json = JSON.stringify;
 const backup = storage => createBackup(storage, { now: new Date('2026-11-18T12:00:00Z'), origin: 'https://www.davidbreyer.com' });
 const parsed = () => parseBackup(json(backup(new Storage(fixtures))));
 
-test('exports only audited keys and exactly preserves all nine app snapshots', () => {
+test('exports only audited keys and exactly preserves all ten app snapshots', () => {
   const source = new Storage({ ...fixtures, unrelated: 'leave me alone', 'future-app.secret': 'private' });
   const data = backup(source);
-  assert.equal(Object.keys(data.apps).length, 9);
-  assert.equal(Object.values(data.apps).flatMap(Object.keys).length, 13);
+  assert.equal(Object.keys(data.apps).length, 10);
+  assert.equal(Object.values(data.apps).flatMap(Object.keys).length, 15);
   assert(!json(data).includes('leave me alone'));
   const destination = new Storage({ unrelated: 'untouched' });
   restoreBackup(destination, parseBackup(json(data)), Object.keys(data.apps));
@@ -123,7 +123,7 @@ test('an unchanged restore performs no writes', () => {
 });
 
 test('card order normalization preserves valid choices and appends missing/new cards', () => {
-  assert.deepEqual(normalizeCardOrder(['todo-card', 'todo-card', 'unknown']), ['todo-card', 'weather-card', 'countdown-card', 'quiz-card', 'upcoming-card', 'clock-card']);
+  assert.deepEqual(normalizeCardOrder(['todo-card', 'todo-card', 'unknown']), ['todo-card', 'weather-card', 'countdown-card', 'quiz-card', 'upcoming-card', 'clock-card', 'luftblasen-card']);
   assert.deepEqual(normalizeCardOrder(null), CARD_IDS);
   assert.deepEqual(normalizeCardOrder({ invalid: true }), CARD_IDS);
 });
@@ -133,9 +133,9 @@ test('inventory reports countdown totals even though clock color is stored as pl
   assert.equal(describeApp(BACKUP_APPS[0], undefined), 'No saved data');
 });
 
-test('existing card layouts gain Upcoming and Clock without changing their saved order or other data', () => {
+test('existing card layouts gain new cards without changing their saved order or other data', () => {
   const oldOrder = JSON.parse(fixtures['lizard-dashboard.card-order.v1']);
-  assert.deepEqual(normalizeCardOrder(oldOrder), [...oldOrder, 'upcoming-card', 'clock-card']);
+  assert.deepEqual(normalizeCardOrder(oldOrder), [...oldOrder, 'upcoming-card', 'clock-card', 'luftblasen-card']);
   const incoming = parsed();
   incoming.apps.dashboard['lizard-dashboard.card-order.v1'] = json(['clock-card', 'upcoming-card', ...oldOrder]);
   incoming.apps.dashboard['lizard-dashboard.hidden-cards.v1'] = json(['clock-card', 'upcoming-card']);

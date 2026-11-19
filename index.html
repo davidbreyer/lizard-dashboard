@@ -54,6 +54,10 @@
             <label><input type="checkbox" value="clock-card" checked> Clock</label>
             <div class="card-move"><button type="button" data-move="-1" aria-label="Move Clock up">↑</button><button type="button" data-move="1" aria-label="Move Clock down">↓</button></div>
           </div>
+          <div class="card-choice" data-card="luftblasen-card">
+            <label><input type="checkbox" value="luftblasen-card"> <span>Luftblasen<small class="card-choice-note">Game · off by default</small></span></label>
+            <div class="card-move"><button type="button" data-move="-1" aria-label="Move Luftblasen up">↑</button><button type="button" data-move="1" aria-label="Move Luftblasen down">↓</button></div>
+          </div>
         </div>
         <p class="card-settings-status" id="card-settings-status" role="status"></p>
         <div class="settings-actions">
@@ -254,6 +258,18 @@
           <p class="clock-local-label">Local time</p>
           <p class="sr-only" id="clock-detail">The colored dots show the seconds remaining in this minute.</p>
           <p class="clock-color-status" id="clock-color-status" role="status"></p>
+        </div>
+      </section>
+      <section class="widget luftblasen" id="luftblasen-card" aria-labelledby="luftblasen-title" hidden>
+        <div class="widget-header">
+          <h2 id="luftblasen-title">Luftblasen</h2>
+          <a class="widget-link" href="https://www.davidbreyer.com/luftblasen/luftblasen.html" target="_blank" rel="noopener" aria-label="Play Luftblasen in a new tab">Play</a>
+        </div>
+        <div class="luftblasen-summary">
+          <div class="luftblasen-bubbles" aria-hidden="true"><span>2</span><span>3</span><span>5</span></div>
+          <p class="luftblasen-description">Pop bubbles. Match the target.</p>
+          <p class="luftblasen-status" id="luftblasen-status" role="status">No scores saved here yet.</p>
+          <dl class="luftblasen-bests" id="luftblasen-bests" aria-label="Personal bests by difficulty" hidden></dl>
         </div>
       </section>
     </div>

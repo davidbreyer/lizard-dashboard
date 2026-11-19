@@ -21,6 +21,13 @@ The card updates when saved data changes, an event passes, or a new day starts.
 Its color picker shares Time Until's saved clock color and is included in that
 app's backup. Clock can be hidden and reordered like every other card.
 
+**Luftblasen** is an optional game card, hidden by default for new and existing
+users. Enable it in Cards to see personal bests for Easy, Casual, Medium, Quick
+and Hard, plus a Play link that opens the game in a new tab. It reads the game's
+`luftblasen.progress.v1` without changing scores or game settings, and refreshes
+when the game saves progress or you return to the dashboard. Its separate opt-in
+preference, `lizard-dashboard.optional-cards.v1`, is included in Dashboard backups.
+
 **Keep screen awake**, at the bottom above the footer, applies to the whole dashboard
 even when Clock is hidden. It starts off on each page load. On supported secure
 browsers it holds a screen wake lock while the dashboard is visible, releases it
@@ -36,8 +43,9 @@ alone. Reload other open Lizard app tabs after restoring.
 
 Backups include saved dashboard preferences, To Do tasks and settings, Time Until
 events and clock color, the quiz library/settings/history, Weather's location,
-Format v1/v2 workspaces, Compare's workspace and Delim's input/settings. Unsaved
-edits and Format v2's large-file sessions are not stored by those apps. Mock,
+Format v1/v2 workspaces, Compare's workspace and Delim's input/settings.
+Luftblasen high scores and game preferences are included as a separate app.
+Unsaved edits and Format v2's large-file sessions are not stored by those apps. Mock,
 Duplicate and DateTime currently have no saved workspace to include.
 
 The backup is a local download and is not uploaded by the dashboard. It contains

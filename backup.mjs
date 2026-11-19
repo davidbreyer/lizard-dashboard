@@ -1,11 +1,15 @@
 import { RECENT_TOOLS_KEY, validRecentTools } from './recent-tools.mjs?v=development';
+import { LUFTBLASEN_KEY, validLuftblasenProgress } from './luftblasen.mjs?v=development';
 
 // Storage contracts audited against the Lizard apps in November 2026.
 // Values stay as their original strings so a backup preserves every saved field.
-export const CARD_IDS = ['weather-card', 'countdown-card', 'todo-card', 'quiz-card', 'upcoming-card', 'clock-card'];
+export const CARD_IDS = ['weather-card', 'countdown-card', 'todo-card', 'quiz-card', 'upcoming-card', 'clock-card', 'luftblasen-card'];
+export const OPTIONAL_CARD_IDS = ['luftblasen-card'];
+export const OPTIONAL_CARDS_KEY = 'lizard-dashboard.optional-cards.v1';
 export const MAX_BACKUP_BYTES = 32 * 1024 * 1024;
 export const BACKUP_APPS = [
-  { id: 'dashboard', name: 'Dashboard', keys: ['lizard-dashboard.hidden-cards.v1', 'lizard-dashboard.card-order.v1', RECENT_TOOLS_KEY], detail: 'Card choices, order and recent tools' },
+  { id: 'dashboard', name: 'Dashboard', keys: ['lizard-dashboard.hidden-cards.v1', 'lizard-dashboard.card-order.v1', RECENT_TOOLS_KEY, OPTIONAL_CARDS_KEY], detail: 'Card choices, order and recent tools' },
+  { id: 'luftblasen', name: 'Luftblasen', keys: [LUFTBLASEN_KEY], detail: 'High scores and game preferences' },
   { id: 'todo', name: 'To Do Lizard', keys: ['todo-lizard:v1', 'todo-lizard:settings:v1'], detail: 'Tasks and list preferences' },
   { id: 'timeuntil', name: 'Time Until', keys: ['timeuntil.events.v1', 'timeuntil.clock.color.v1'], detail: 'Countdowns and clock color' },
   { id: 'quiz', name: 'Quiz Your Lizard', keys: ['quiz-your-lizard:v1'], detail: 'Quiz library, settings and practice history' },
@@ -30,6 +34,12 @@ const validDate = value => {
 
 export function normalizeCardOrder(value) {
   return [...new Set([...(Array.isArray(value) ? value : []), ...CARD_IDS])].filter(id => CARD_IDS.includes(id));
+}
+
+export function visibleCardIds(hidden, optional) {
+  const excluded = Array.isArray(hidden) ? hidden : [];
+  const enabled = Array.isArray(optional) ? optional : [];
+  return CARD_IDS.filter(id => !excluded.includes(id) && (!OPTIONAL_CARD_IDS.includes(id) || enabled.includes(id)));
 }
 
 function validQuiz(value) {
@@ -59,6 +69,10 @@ function validValue(key, raw) {
   try { value = JSON.parse(raw); } catch { return false; }
   if (key === 'format-lizard.workspace.v2' && raw.length > 1024 * 1024) return false;
   switch (key) {
+    case LUFTBLASEN_KEY:
+      return validLuftblasenProgress(value);
+    case OPTIONAL_CARDS_KEY:
+      return Array.isArray(value) && value.every(id => OPTIONAL_CARD_IDS.includes(id)) && unique(value);
     case RECENT_TOOLS_KEY:
       return validRecentTools(value);
     case 'lizard-dashboard.hidden-cards.v1':
@@ -149,6 +163,7 @@ export function describeApp(app, entries) {
     const raw = entries[app.keys[0]];
     const value = raw == null ? null : JSON.parse(raw);
     if (app.id === 'todo' && Array.isArray(value)) return value.length + (value.length === 1 ? ' task' : ' tasks') + ' · list preferences';
+    if (app.id === 'luftblasen' && Array.isArray(value?.scores)) return value.scores.length + (value.scores.length === 1 ? ' saved score' : ' saved scores') + ' · game preferences';
     if (app.id === 'timeuntil' && Array.isArray(value?.events)) return value.events.length + (value.events.length === 1 ? ' countdown' : ' countdowns') + ' · clock preferences';
     if (app.id === 'quiz' && Array.isArray(value?.quizzes)) {
       const historyCount = value.history?.length || 0;

@@ -1,9 +1,10 @@
-import { CARD_IDS, normalizeCardOrder } from './backup.mjs?v=development';
+import { CARD_IDS, OPTIONAL_CARD_IDS, OPTIONAL_CARDS_KEY, normalizeCardOrder, visibleCardIds } from './backup.mjs?v=development';
 import { initBackup } from './backup-ui.mjs?v=development';
 import { buildUpcoming } from './upcoming.mjs?v=development';
 import { RECENT_TOOLS_KEY, refreshRecentTools } from './recent-tools.mjs?v=development';
 import { CLOCK_COLOR_KEY, initClockCard } from './clock.mjs?v=development';
 import { initKeepAwake } from './wake-lock.mjs?v=development';
+import { LUFTBLASEN_KEY, initLuftblasenCard } from './luftblasen.mjs?v=development';
 
 const byId = (id) => document.getElementById(id);
 const countdownKey = 'timeuntil.events.v1';
@@ -16,6 +17,7 @@ const cardSettings = byId('card-settings');
 const cardChoices = [...cardSettings.querySelectorAll('input[type="checkbox"]')];
 const weatherCard = byId('weather-card');
 const clockCard = initClockCard();
+const luftblasenCard = initLuftblasenCard();
 initKeepAwake();
 const dashboardDate = new Intl.DateTimeFormat(undefined, { weekday: 'long', month: 'long', day: 'numeric' });
 const eventDate = new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' });
@@ -620,7 +622,10 @@ function readCardVisibility() {
   const hidden = Array.isArray(saved) ? saved : [];
   try { cardOrder = normalizeCardOrder(JSON.parse(localStorage.getItem(cardOrderKey))); }
   catch { cardOrder = [...CARD_IDS]; }
-  for (const choice of cardChoices) choice.checked = !hidden.includes(choice.value);
+  let optional;
+  try { optional = JSON.parse(localStorage.getItem(OPTIONAL_CARDS_KEY)); } catch { optional = []; }
+  const visible = visibleCardIds(hidden, optional);
+  for (const choice of cardChoices) choice.checked = visible.includes(choice.value);
   applyCardVisibility();
 }
 
@@ -645,7 +650,8 @@ function moveCard(button) {
 }
 
 window.addEventListener('storage', ({ key }) => {
-  if (key === hiddenCardsKey || key === cardOrderKey || key === null) readCardVisibility();
+  if (key === hiddenCardsKey || key === cardOrderKey || key === OPTIONAL_CARDS_KEY || key === null) readCardVisibility();
+  if (key === LUFTBLASEN_KEY || key === null) luftblasenCard.refresh();
   if (key === countdownKey || key === null) readCountdown();
   if (key === quizKey || key === null) readQuizSummary();
   if (key === todoKey || key === null) readTodoSummary();
@@ -653,12 +659,16 @@ window.addEventListener('storage', ({ key }) => {
   if (key === CLOCK_COLOR_KEY || key === null) clockCard.restoreColor();
 });
 window.addEventListener('pageshow', () => {
+  luftblasenCard.refresh();
   readCountdown();
   readQuizSummary();
   readTodoSummary();
   refreshWeatherIfStale();
 });
-document.addEventListener('visibilitychange', refreshWeatherIfStale);
+document.addEventListener('visibilitychange', () => {
+  refreshWeatherIfStale();
+  if (!document.hidden) luftblasenCard.refresh();
+});
 countdownSelect.addEventListener('change', selectCountdown);
 byId('cards-button').addEventListener('click', () => cardSettings.showModal());
 cardSettings.addEventListener('click', event => {
@@ -670,6 +680,8 @@ cardSettings.addEventListener('change', () => {
   const status = byId('card-settings-status');
   try {
     const hidden = cardChoices.filter((choice) => !choice.checked).map((choice) => choice.value);
+    const optional = cardChoices.filter(choice => choice.checked && OPTIONAL_CARD_IDS.includes(choice.value)).map(choice => choice.value);
+    localStorage.setItem(OPTIONAL_CARDS_KEY, JSON.stringify(optional));
     localStorage.setItem(hiddenCardsKey, JSON.stringify(hidden));
     status.textContent = '';
     status.classList.remove('is-error');
@@ -696,9 +708,10 @@ byId('upcoming-more').addEventListener('click', () => {
 });
 
 initBackup({ onRestore(keys) {
+  if (keys.includes(LUFTBLASEN_KEY)) luftblasenCard.refresh();
   if (keys.includes(CLOCK_COLOR_KEY)) clockCard.restoreColor();
   if (keys.includes(RECENT_TOOLS_KEY)) refreshRecentTools();
-  if (keys.includes(hiddenCardsKey) || keys.includes(cardOrderKey)) readCardVisibility();
+  if (keys.includes(hiddenCardsKey) || keys.includes(cardOrderKey) || keys.includes(OPTIONAL_CARDS_KEY)) readCardVisibility();
   if (keys.includes(countdownKey)) readCountdown();
   if (keys.includes(quizKey)) readQuizSummary();
   if (keys.includes(todoKey)) readTodoSummary();

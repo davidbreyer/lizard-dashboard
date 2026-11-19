@@ -12,6 +12,7 @@ on:
       - 'recent-tools.mjs'
       - 'clock.mjs'
       - 'wake-lock.mjs'
+      - 'luftblasen.mjs'
       - 'tests/**'
       - 'styles.css'
       - 'lizard.png'
