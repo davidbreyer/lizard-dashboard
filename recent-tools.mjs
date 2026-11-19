@@ -1,4 +1,5 @@
 export const RECENT_TOOLS_KEY = 'lizard-dashboard.recent-tools.v1';
+export const PINNED_TOOL_KEY = 'lizard-dashboard.pinned-tool.v1';
 export const TOOLS = [
   { id: 'compare-lizard', name: 'Compare Lizard', icon: '±', description: 'Compare JSON and XML side by side.' },
   { id: 'format-lizard', name: 'Format Lizard', icon: '{ }', description: 'Format JSON, XML, YAML, and CSS.' },
@@ -8,7 +9,7 @@ export const TOOLS = [
   { id: 'delim-lizard', name: 'Delim Lizard', icon: ',', description: 'Build lists for SQL, CSV, JavaScript, and URLs.' }
 ];
 const ids = TOOLS.map(tool => tool.id);
-const defaultIds = ['compare-lizard', 'format-lizard', 'mock-lizard'];
+const defaultIds = ['format-lizard', 'compare-lizard', 'mock-lizard'];
 const appOrigin = 'https://www.davidbreyer.com';
 
 export function normalizeRecentTools(value) {
@@ -40,23 +41,43 @@ export function recordRecentTool(storage, id) {
   return true;
 }
 
-export function recentShortcuts(value) {
+export function validPinnedTool(value) {
+  return ids.includes(value);
+}
+
+export function recentShortcuts(value, pinned) {
   const recent = normalizeRecentTools(value);
-  return (recent.length ? recent.slice(0, 3) : defaultIds).map(id => TOOLS.find(tool => tool.id === id));
+  const candidates = recent.length ? recent : defaultIds;
+  const ordered = validPinnedTool(pinned) ? [pinned, ...candidates.filter(id => id !== pinned)] : candidates;
+  return ordered.slice(0, 3).map(id => TOOLS.find(tool => tool.id === id));
 }
 
 export function refreshRecentTools(message = '') {
   if (typeof document === 'undefined') return;
   const container = document.getElementById('recent-tools');
+  let pinned;
+  try { pinned = JSON.parse(localStorage.getItem(PINNED_TOOL_KEY)); } catch { /* Use the ordinary shortcuts. */ }
+  const favorite = TOOLS.find(tool => tool.id === pinned);
+  const pinStatus = document.getElementById('pin-status');
+  if (pinStatus) {
+    pinStatus.hidden = false;
+    pinStatus.textContent = message || (favorite ? favorite.name + ' is pinned first on your dashboard.' : 'Pin one tool to keep it first on your dashboard.');
+    for (const button of document.querySelectorAll('[data-pin]')) {
+      const active = button.dataset.pin === pinned;
+      button.hidden = false;
+      button.textContent = active ? 'Pinned' : 'Pin';
+      button.setAttribute('aria-pressed', String(active));
+    }
+  }
   if (!container) return;
   let recent = [];
   try { recent = normalizeRecentTools(JSON.parse(localStorage.getItem(RECENT_TOOLS_KEY))); }
   catch { message = message || 'Recent tools are unavailable in this browser. You can still open any tool.'; }
-  document.getElementById('tools-title').textContent = recent.length ? 'Recent tools' : 'Lizard Tools';
-  document.getElementById('recent-tools-status').textContent = message || (recent.length
+  document.getElementById('tools-title').textContent = recent.length && !favorite ? 'Recent tools' : 'Lizard Tools';
+  document.getElementById('recent-tools-status').textContent = message || (favorite ? favorite.name + ' is pinned first.' : recent.length
     ? 'Most recently opened first.' : 'Open a tool here or in the directory to build your recent list.');
   document.getElementById('recent-tools-clear').hidden = recent.length === 0;
-  const shortcuts = recentShortcuts(recent);
+  const shortcuts = recentShortcuts(recent, pinned);
   const signature = shortcuts.map(tool => tool.id).join(',');
   if (container.dataset.recentIds === signature) return;
   const focusedUrl = container.contains(document.activeElement) ? document.activeElement.closest('a')?.href : null;
@@ -76,6 +97,15 @@ export function refreshRecentTools(message = '') {
 }
 
 function initRecentTools() {
+  for (const button of document.querySelectorAll('[data-pin]')) {
+    button.addEventListener('click', () => {
+      try {
+        if (button.getAttribute('aria-pressed') === 'true') localStorage.removeItem(PINNED_TOOL_KEY);
+        else localStorage.setItem(PINNED_TOOL_KEY, JSON.stringify(button.dataset.pin));
+        refreshRecentTools();
+      } catch { refreshRecentTools('Your browser could not save the pin.'); }
+    });
+  }
   function track(event) {
     if (event.defaultPrevented || (event.type === 'click' ? event.button !== 0 : event.button !== 1)) return;
     if (!(event.target instanceof Element)) return;
@@ -99,7 +129,7 @@ function initRecentTools() {
     } catch { document.getElementById('recent-tools-status').textContent = 'Recent tool history could not be cleared.'; }
   });
   window.addEventListener('storage', event => {
-    if (event.key === RECENT_TOOLS_KEY || event.key === null) refreshRecentTools();
+    if (event.key === RECENT_TOOLS_KEY || event.key === PINNED_TOOL_KEY || event.key === null) refreshRecentTools();
   });
   window.addEventListener('pageshow', () => refreshRecentTools());
   document.addEventListener('visibilitychange', () => {

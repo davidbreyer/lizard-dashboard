@@ -293,6 +293,12 @@ h1 { font-size: clamp(54px, 8.1vw, 108px); line-height: .93; }
 .tool-arrow { align-self: start; font-size: 17px; color: #4b6542; }
 .directory-intro p { max-width: 38rem; margin-top: 16px; color: var(--muted); font-size: clamp(15px, 2vw, 18px); line-height: 1.55; }
 .tool-links.directory-links { grid-template-columns: repeat(2, minmax(0, 1fr)); margin-bottom: 36px; }
+.directory-pin-note { margin: 0 0 12px; font-size: .875rem; color: var(--muted); }
+.directory-entry { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.directory-entry:first-child { grid-column: 1 / -1; }
+.directory-entry .tool { flex: 1; min-width: 0; }
+.tool-pin { min-width: 58px; min-height: 44px; padding: 5px 8px; border: 1px solid var(--line); border-radius: 9px; background: #fcfdf7; font-size: .875rem; cursor: pointer; }
+.tool-pin[aria-pressed="true"] { background: var(--pine); border-color: var(--pine); color: white; }
 .directory-links .tool { grid-template-columns: auto minmax(0, 1fr) auto; min-height: 94px; padding: 15px; }
 .directory-links .tool strong { font-size: 17px; letter-spacing: -.02em; }
 .directory-links .tool small { font-size: 13px; }

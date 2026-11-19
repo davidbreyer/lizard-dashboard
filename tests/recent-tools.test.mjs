@@ -27,7 +27,15 @@ test('all six tools fit in history while the dashboard shows the last three actu
   assert.equal(history.length, 6);
   assert.deepEqual(recentShortcuts(history).map(tool => tool.id), ['delim-lizard', 'datetime-lizard', 'duplicate-lizard']);
   assert.deepEqual(recentShortcuts(['delim-lizard']).map(tool => tool.id), ['delim-lizard']);
-  assert.deepEqual(recentShortcuts([]).map(tool => tool.id), ['compare-lizard', 'format-lizard', 'mock-lizard']);
+  assert.deepEqual(recentShortcuts([]).map(tool => tool.id), ['format-lizard', 'compare-lizard', 'mock-lizard']);
+});
+
+test('one pin leads defaults or recent tools without duplicates or changing the history', () => {
+  const ids = (history, pin) => recentShortcuts(history, pin).map(tool => tool.id);
+  assert.deepEqual(ids([], 'delim-lizard'), ['delim-lizard', 'format-lizard', 'compare-lizard']);
+  const history = ['mock-lizard', 'compare-lizard', 'format-lizard'];
+  assert.deepEqual(ids(history, 'compare-lizard'), ['compare-lizard', 'mock-lizard', 'format-lizard']);
+  assert.deepEqual(ids(history, 'unknown'), history);
 });
 
 test('only known tool destinations on the correct site are recorded', () => {

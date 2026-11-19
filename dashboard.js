@@ -1,7 +1,7 @@
 import { CARD_IDS, OPTIONAL_CARD_IDS, OPTIONAL_CARDS_KEY, COMPACT_CARDS_KEY, normalizeCardOrder, visibleCardIds } from './backup.mjs?v=development';
 import { initBackup } from './backup-ui.mjs?v=development';
 import { buildUpcoming } from './upcoming.mjs?v=development';
-import { RECENT_TOOLS_KEY, refreshRecentTools } from './recent-tools.mjs?v=development';
+import { RECENT_TOOLS_KEY, PINNED_TOOL_KEY, refreshRecentTools } from './recent-tools.mjs?v=development';
 import { CLOCK_COLOR_KEY, initClockCard } from './clock.mjs?v=development';
 import { initKeepAwake } from './wake-lock.mjs?v=development';
 import { LUFTBLASEN_KEY, initLuftblasenCard } from './luftblasen.mjs?v=development';
@@ -840,7 +840,7 @@ initBackup({ onRestore(keys) {
   if (keys.includes(COMPACT_CARDS_KEY)) readCompactCards();
   if (keys.includes(LUFTBLASEN_KEY)) luftblasenCard.refresh();
   if (keys.includes(CLOCK_COLOR_KEY)) clockCard.restoreColor();
-  if (keys.includes(RECENT_TOOLS_KEY)) refreshRecentTools();
+  if (keys.includes(RECENT_TOOLS_KEY) || keys.includes(PINNED_TOOL_KEY)) refreshRecentTools();
   if (keys.includes(hiddenCardsKey) || keys.includes(cardOrderKey) || keys.includes(OPTIONAL_CARDS_KEY)) readCardVisibility();
   if (keys.includes(countdownKey)) readCountdown();
   if (keys.includes(quizKey)) readQuizSummary();

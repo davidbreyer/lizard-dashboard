@@ -1,4 +1,4 @@
-import { RECENT_TOOLS_KEY, validRecentTools } from './recent-tools.mjs?v=development';
+import { RECENT_TOOLS_KEY, PINNED_TOOL_KEY, validRecentTools, validPinnedTool } from './recent-tools.mjs?v=development';
 import { LUFTBLASEN_KEY, validLuftblasenProgress } from './luftblasen.mjs?v=development';
 
 // Storage contracts audited against the Lizard apps in November 2026.
@@ -9,7 +9,7 @@ export const OPTIONAL_CARDS_KEY = 'lizard-dashboard.optional-cards.v1';
 export const COMPACT_CARDS_KEY = 'lizard-dashboard.compact-cards.v1';
 export const MAX_BACKUP_BYTES = 32 * 1024 * 1024;
 export const BACKUP_APPS = [
-  { id: 'dashboard', name: 'Dashboard', keys: ['lizard-dashboard.hidden-cards.v1', 'lizard-dashboard.card-order.v1', RECENT_TOOLS_KEY, OPTIONAL_CARDS_KEY, COMPACT_CARDS_KEY], detail: 'Card choices, order and recent tools' },
+  { id: 'dashboard', name: 'Dashboard', keys: ['lizard-dashboard.hidden-cards.v1', 'lizard-dashboard.card-order.v1', RECENT_TOOLS_KEY, OPTIONAL_CARDS_KEY, COMPACT_CARDS_KEY, PINNED_TOOL_KEY], detail: 'Card choices, order, recent tools and pinned tool' },
   { id: 'luftblasen', name: 'Luftblasen', keys: [LUFTBLASEN_KEY], detail: 'High scores and game preferences' },
   { id: 'todo', name: 'To Do Lizard', keys: ['todo-lizard:v1', 'todo-lizard:settings:v1'], detail: 'Tasks and list preferences' },
   { id: 'timeuntil', name: 'Time Until', keys: ['timeuntil.events.v1', 'timeuntil.clock.color.v1'], detail: 'Countdowns and clock color' },
@@ -76,6 +76,8 @@ function validValue(key, raw) {
       return Array.isArray(value) && value.every(id => OPTIONAL_CARD_IDS.includes(id)) && unique(value);
     case RECENT_TOOLS_KEY:
       return validRecentTools(value);
+    case PINNED_TOOL_KEY:
+      return validPinnedTool(value);
     case 'lizard-dashboard.hidden-cards.v1':
     case COMPACT_CARDS_KEY:
     case 'lizard-dashboard.card-order.v1':

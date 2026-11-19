@@ -8,10 +8,10 @@ Turn on **Compact** beside any card to save a shorter default view. **Show more*
 opens its full view for this visit. Compact choices are included in Dashboard backups.
 
 The tools section shows up to three tools most recently opened from the dashboard
-or its Tools directory, newest first. Until the first launch it shows the original
-Compare, Format and Mock shortcuts. Reopening a tool moves it to the front;
-Clear history resets these shortcuts. History consists only of up to six tool
-identifiers in this browser, and is included with Dashboard preferences in backups.
+or its Tools directory, newest first. Before the first launch it shows Format,
+Compare and Mock. Pin one tool in the directory to keep it in the first slot.
+Select Pinned to unpin it, or pin another tool to replace it. Clear history
+resets recent activity. The pin and history are saved with Dashboard backups.
 
 **Upcoming** combines open tasks with due dates and future Time Until events,
 grouped by local calendar date. Its rolling seven-day window includes today and
