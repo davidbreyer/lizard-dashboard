@@ -317,8 +317,37 @@
       <label class="dashboard-awake-toggle"><input type="checkbox" id="dashboard-keep-awake" role="switch" autocomplete="off" aria-describedby="dashboard-awake-status dashboard-awake-help"><span>Keep screen awake</span></label>
       <span class="dashboard-awake-status" id="dashboard-awake-status" role="status">Off</span>
       <span class="sr-only" id="dashboard-awake-help">Applies to the entire dashboard while this tab is visible. Starts off each time the page is reloaded.</span>
+      <button class="cards-button" id="desk-enter" type="button" aria-haspopup="dialog" aria-controls="desk-mode">Enter Desk mode</button>
     </div>
   </main>
+
+  <dialog id="desk-mode" class="desk-mode" aria-labelledby="desk-title">
+    <div class="desk-layout">
+      <header class="desk-header">
+        <h2 id="desk-title">Desk mode</h2>
+        <button type="button" id="desk-exit" autofocus>Exit Desk mode</button>
+      </header>
+      <div class="desk-display">
+        <div class="desk-clock">
+          <p id="desk-date"></p>
+          <time id="desk-time" aria-label="Local time"></time>
+        </div>
+        <div class="desk-details">
+          <section aria-label="Current weather">
+            <h3>Weather <span id="desk-place"></span></h3>
+            <p id="desk-temperature"></p>
+            <p class="desk-secondary" id="desk-condition"></p>
+            <p class="desk-note" id="desk-weather-note"></p>
+          </section>
+          <section aria-labelledby="desk-next-heading">
+            <h3 id="desk-next-heading">Up next</h3>
+            <p id="desk-next"></p>
+            <p class="desk-secondary" id="desk-when"></p>
+          </section>
+        </div>
+      </div>
+    </div>
+  </dialog>
 
   <footer class="shell site-footer">
     <a href="https://www.davidbreyer.com/" target="_blank" rel="noopener">David Breyer <span role="img" aria-label="Opens in a new tab">↗</span></a>

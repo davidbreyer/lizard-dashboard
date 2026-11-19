@@ -2,7 +2,7 @@ import { CARD_IDS, OPTIONAL_CARD_IDS, OPTIONAL_CARDS_KEY, COMPACT_CARDS_KEY, nor
 import { initBackup } from './backup-ui.mjs?v=development';
 import { buildUpcoming } from './upcoming.mjs?v=development';
 import { RECENT_TOOLS_KEY, PINNED_TOOL_KEY, refreshRecentTools } from './recent-tools.mjs?v=development';
-import { CLOCK_COLOR_KEY, initClockCard } from './clock.mjs?v=development';
+import { CLOCK_COLOR_KEY, clockState, initClockCard } from './clock.mjs?v=development';
 import { initKeepAwake } from './wake-lock.mjs?v=development';
 import { LUFTBLASEN_KEY, initLuftblasenCard } from './luftblasen.mjs?v=development';
 
@@ -18,6 +18,8 @@ const cardChoices = [...cardSettings.querySelectorAll('input[type="checkbox"]')]
 const compactControls = new Map();
 let compactCards = new Set();
 const weatherCard = byId('weather-card');
+const deskMode = byId('desk-mode');
+let deskReturnY = 0;
 const clockCard = initClockCard();
 const luftblasenCard = initLuftblasenCard();
 initKeepAwake();
@@ -111,7 +113,8 @@ function selectCountdown() {
 
 function tick() {
   const now = new Date();
-  if (weatherLoadedAt && !document.hidden && !weatherCard.hidden) updateWeatherAge(now.getTime());
+  if (weatherLoadedAt && !document.hidden && (!weatherCard.hidden || deskMode.open)) updateWeatherAge(now.getTime());
+  if (deskMode.open) updateDeskDisplay(now);
   const today = now.toDateString();
   if (today !== displayedDate) {
     displayedDate = today;
@@ -359,6 +362,14 @@ function readUpcoming() {
   const now = new Date();
   const schedule = buildUpcoming({ tasks, events }, now);
   const { items, startKey } = schedule;
+  if (deskMode.open) {
+    const next = items[0] ?? buildUpcoming({ tasks, events, includeLater: true }, now).items[0];
+    byId('desk-next').textContent = next?.title ?? (errors.length ? 'Schedule unavailable' : 'Nothing scheduled');
+    let detail = '';
+    if (next?.kind === 'event') detail = 'Countdown · ' + eventDate.format(next.timestamp);
+    if (next?.kind === 'task') detail = next.dateKey === startKey ? 'Task · Due today' : 'Task · Due ' + taskDate.format(new Date(next.dateKey + 'T00:00:00Z'));
+    byId('desk-when').textContent = [detail, ...errors].filter(Boolean).join(' · ');
+  }
   upcomingRefreshAt = schedule.refreshAt;
   const tasksCount = items.filter(item => item.kind === 'task').length;
   const eventsCount = items.length - tasksCount;
@@ -589,7 +600,7 @@ function locateUser() {
 }
 
 async function updateWeather(mode = 'refresh') {
-  if (weatherBusy || weatherCard.hidden) return;
+  if (weatherBusy || (weatherCard.hidden && !deskMode.open)) return;
   const request = ++weatherRequest;
   weatherBusy = locationButton.disabled = defaultButton.disabled = refreshButton.disabled = true;
   const status = byId('weather-status');
@@ -641,6 +652,7 @@ async function updateWeather(mode = 'refresh') {
     if (request === weatherRequest) {
       defaultButton.hidden = activeLocation === defaultLocation;
       weatherBusy = locationButton.disabled = defaultButton.disabled = refreshButton.disabled = false;
+      if (deskMode.open) updateDeskDisplay(new Date());
     }
   }
 }
@@ -673,8 +685,45 @@ function updateWeatherAge(now) {
 }
 
 function refreshWeatherIfStale() {
-  if (!document.hidden && weatherLoadedAt && Date.now() - weatherLoadedAt >= 15 * 60000) updateWeather();
+  if (document.hidden) return;
+  if (weatherLoadedAt ? Date.now() - weatherLoadedAt >= 15 * 60000 : deskMode.open) updateWeather();
 }
+
+function updateDeskDisplay(now) {
+  const time = clockState(now).time;
+  const display = byId('desk-time');
+  if (display.dateTime !== time) {
+    display.textContent = time;
+    display.dateTime = time;
+    display.setAttribute('aria-label', time + ' local time');
+  }
+  const hasWeather = !byId('weather-reading').hidden;
+  const values = {
+    'desk-date': dashboardDate.format(now),
+    'desk-place': byId('weather-place').textContent,
+    'desk-temperature': hasWeather ? byId('weather-temperature').textContent : '',
+    'desk-condition': hasWeather ? byId('weather-condition').textContent : '',
+    'desk-weather-note': [byId('weather-status').textContent, hasWeather ? freshness.textContent : ''].filter(Boolean).join(' · ')
+  };
+  for (const [id, text] of Object.entries(values)) {
+    const element = byId(id);
+    if (element.textContent !== text) element.textContent = text;
+  }
+}
+
+byId('desk-enter').addEventListener('click', () => {
+  deskReturnY = window.scrollY;
+  deskMode.showModal();
+  tick();
+  readUpcoming();
+  if (!weatherLoadedAt) updateWeather();
+  else refreshWeatherIfStale();
+});
+byId('desk-exit').addEventListener('click', () => deskMode.close());
+deskMode.addEventListener('close', () => {
+  byId('desk-enter').focus({ preventScroll: true });
+  window.scrollTo(0, deskReturnY);
+});
 
 function applyCardVisibility() {
   const weatherWasHidden = weatherCard.hidden;

@@ -30,6 +30,10 @@ and Hard, plus a Play link that opens the game in a new tab. It reads the game's
 when the game saves progress or you return to the dashboard. Its separate opt-in
 preference, `lizard-dashboard.optional-cards.v1`, is included in Dashboard backups.
 
+**Enter Desk mode** beside Keep screen awake opens a large local clock, weather
+for the dashboard location, and the next scheduled task or countdown. Use
+**Exit Desk mode** or Escape to return to the same place on the dashboard.
+
 **Keep screen awake**, at the bottom above the footer, applies to the whole dashboard
 even when Clock is hidden. It starts off on each page load. On supported secure
 browsers it holds a screen wake lock while the dashboard is visible, releases it
