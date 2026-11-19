@@ -35,9 +35,13 @@ export function initLuftblasenCard() {
   const formatter = new Intl.NumberFormat();
   function refresh() {
     try {
-      const bests = luftblasenBests(JSON.parse(localStorage.getItem(LUFTBLASEN_KEY)));
-      list.replaceChildren(...bests.map(({ name, best }) => {
+      const progress = JSON.parse(localStorage.getItem(LUFTBLASEN_KEY));
+      const bests = luftblasenBests(progress);
+      // The game retains ranked runs, so use the most recent recorded run.
+      const latest = progress?.scores.filter(validLuftblasenScore).sort((a, b) => Date.parse(b.date) - Date.parse(a.date))[0];
+      list.replaceChildren(...bests.map(({ name, best }, index) => {
         const row = document.createElement('div');
+        row.classList.toggle('latest-difficulty', latest?.difficulty === index + 1);
         const label = document.createElement('dt');
         const value = document.createElement('dd');
         label.textContent = name;

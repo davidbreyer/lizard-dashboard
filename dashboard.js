@@ -1,4 +1,4 @@
-import { CARD_IDS, OPTIONAL_CARD_IDS, OPTIONAL_CARDS_KEY, normalizeCardOrder, visibleCardIds } from './backup.mjs?v=development';
+import { CARD_IDS, OPTIONAL_CARD_IDS, OPTIONAL_CARDS_KEY, COMPACT_CARDS_KEY, normalizeCardOrder, visibleCardIds } from './backup.mjs?v=development';
 import { initBackup } from './backup-ui.mjs?v=development';
 import { buildUpcoming } from './upcoming.mjs?v=development';
 import { RECENT_TOOLS_KEY, refreshRecentTools } from './recent-tools.mjs?v=development';
@@ -15,6 +15,8 @@ const cardOrderKey = 'lizard-dashboard.card-order.v1';
 let cardOrder = [...CARD_IDS];
 const cardSettings = byId('card-settings');
 const cardChoices = [...cardSettings.querySelectorAll('input[type="checkbox"]')];
+const compactControls = new Map();
+let compactCards = new Set();
 const weatherCard = byId('weather-card');
 const clockCard = initClockCard();
 const luftblasenCard = initLuftblasenCard();
@@ -485,6 +487,14 @@ function renderWeather(properties, periods, label, observation, alerts) {
   byId('weather-temperature').textContent = freshObservation ? `${Math.round(fahrenheit)}°F` : `${firstHour.temperature}°${firstHour.temperatureUnit}`;
   byId('weather-condition').textContent = freshObservation ? observation.textDescription || 'Current conditions' : firstHour.shortForecast;
   byId('weather-source').textContent = freshObservation ? 'Latest observation' : 'Hourly forecast';
+  const precipPeriod = recentPeriods.find(period => Number.isFinite(period.probabilityOfPrecipitation?.value));
+  const precip = byId('weather-compact-precip');
+  precip.textContent = '';
+  if (precipPeriod) {
+    const time = new Date(precipPeriod.startTime);
+    const when = time <= now ? 'This hour' : time.toLocaleString(undefined, { weekday: 'short', hour: 'numeric', timeZone: properties.timeZone });
+    precip.textContent = when + ' · ' + precipPeriod.probabilityOfPrecipitation.value + '% chance of precipitation';
+  }
   byId('weather-reading').hidden = false;
 
   timeWindows.forEach((window, index) => {
@@ -612,6 +622,62 @@ function applyCardVisibility() {
   if (weatherWasHidden && !weatherCard.hidden) updateWeather();
 }
 
+function renderCompactCard(id, expanded = false) {
+  const { preference, disclosure, title } = compactControls.get(id);
+  const compact = compactCards.has(id);
+  byId(id).classList.toggle('is-compact', compact && !expanded);
+  preference.setAttribute('aria-pressed', String(compact));
+  disclosure.hidden = !compact;
+  disclosure.setAttribute('aria-expanded', String(expanded));
+  disclosure.textContent = expanded ? 'Show less' : 'Show more';
+  disclosure.setAttribute('aria-label', disclosure.textContent + ' for ' + title);
+}
+
+function readCompactCards() {
+  let saved;
+  try { saved = JSON.parse(localStorage.getItem(COMPACT_CARDS_KEY)); } catch { /* Start in full view. */ }
+  compactCards = new Set(Array.isArray(saved) ? saved.filter(id => CARD_IDS.includes(id)) : []);
+  for (const id of CARD_IDS) renderCompactCard(id);
+}
+
+function initCompactCards() {
+  for (const row of cardSettings.querySelectorAll('.card-choice')) {
+    const id = row.dataset.card;
+    const header = byId(id).querySelector('.widget-header');
+    const heading = header.querySelector('h2');
+    const title = heading.textContent;
+    const preference = document.createElement('button');
+    preference.type = 'button';
+    preference.className = 'compact-preference';
+    preference.textContent = 'Compact';
+    preference.setAttribute('aria-label', 'Compact view for ' + title);
+    row.insertBefore(preference, row.querySelector('.card-move'));
+    const disclosure = document.createElement('button');
+    disclosure.type = 'button';
+    disclosure.className = 'compact-disclosure';
+    const headingGroup = document.createElement('div');
+    heading.replaceWith(headingGroup);
+    headingGroup.append(heading, disclosure);
+    compactControls.set(id, { preference, disclosure, title });
+    disclosure.addEventListener('click', () => renderCompactCard(id, byId(id).classList.contains('is-compact')));
+    preference.addEventListener('click', () => {
+      if (compactCards.has(id)) compactCards.delete(id);
+      else compactCards.add(id);
+      renderCompactCard(id);
+      const status = byId('card-settings-status');
+      try {
+        localStorage.setItem(COMPACT_CARDS_KEY, JSON.stringify([...compactCards]));
+        status.textContent = '';
+        status.classList.remove('is-error');
+      } catch {
+        status.textContent = 'View changed for this visit. Your browser could not save it.';
+        status.classList.add('is-error');
+      }
+    });
+  }
+  readCompactCards();
+}
+
 function readCardVisibility() {
   let saved;
   try {
@@ -650,6 +716,7 @@ function moveCard(button) {
 }
 
 window.addEventListener('storage', ({ key }) => {
+  if (key === COMPACT_CARDS_KEY || key === null) readCompactCards();
   if (key === hiddenCardsKey || key === cardOrderKey || key === OPTIONAL_CARDS_KEY || key === null) readCardVisibility();
   if (key === LUFTBLASEN_KEY || key === null) luftblasenCard.refresh();
   if (key === countdownKey || key === null) readCountdown();
@@ -708,6 +775,7 @@ byId('upcoming-more').addEventListener('click', () => {
 });
 
 initBackup({ onRestore(keys) {
+  if (keys.includes(COMPACT_CARDS_KEY)) readCompactCards();
   if (keys.includes(LUFTBLASEN_KEY)) luftblasenCard.refresh();
   if (keys.includes(CLOCK_COLOR_KEY)) clockCard.restoreColor();
   if (keys.includes(RECENT_TOOLS_KEY)) refreshRecentTools();
@@ -718,6 +786,7 @@ initBackup({ onRestore(keys) {
   if (keys.includes(weatherLocationKey)) refreshSavedWeather();
 } });
 
+initCompactCards();
 readCardVisibility();
 readCountdown();
 readQuizSummary();

@@ -4,6 +4,8 @@ The dashboard reads saved Lizard app data from the same browser and origin.
 
 Use **Cards** to show, hide and reorder the dashboard cards. The arrow buttons work
 with a keyboard or on a phone. Card choices and order are remembered locally.
+Turn on **Compact** beside any card to save a shorter default view. **Show more**
+opens its full view for this visit. Compact choices are included in Dashboard backups.
 
 The tools section shows up to three tools most recently opened from the dashboard
 or its Tools directory, newest first. Until the first launch it shows the original

@@ -4,6 +4,7 @@ export const fixtures = {
   'lizard-dashboard.card-order.v1': json(['todo-card', 'quiz-card', 'countdown-card', 'weather-card']),
   'lizard-dashboard.recent-tools.v1': json(['delim-lizard', 'compare-lizard', 'format-lizard']),
   'lizard-dashboard.optional-cards.v1': json([]),
+  'lizard-dashboard.compact-cards.v1': json(['todo-card', 'weather-card']),
   'luftblasen.progress.v1': json({ version: 1, settings: { theme: 'classic', difficulty: 3, music: true, pops: false }, scores: [{ scoringVersion: 1, score: 12840, difficulty: 3, round: 12, timePlayedMs: 95000, bestStreak: 9, bubblesPopped: 76, date: '2026-11-19T12:00:00.000Z', theme: 'classic' }] }),
   'todo-lizard:v1': json([{ id: 't1', title: 'Back up the planner', dueDate: '2028-02-29', priority: 'high', completed: false, createdAt: '2026-11-18T12:00:00Z', completedAt: null }]),
   'todo-lizard:settings:v1': json({ filter: 'active', sort: 'due', search: '' }),

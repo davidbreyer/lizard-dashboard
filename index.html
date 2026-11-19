@@ -28,7 +28,7 @@
     <dialog class="card-settings" id="card-settings" aria-labelledby="card-settings-title">
       <form method="dialog">
         <h2 id="card-settings-title">Dashboard cards</h2>
-        <p class="settings-hint">Choose your cards and use the arrows to arrange them.</p>
+        <p class="settings-hint">Choose your cards, turn on Compact for a shorter view, or use the arrows to reorder.</p>
         <div class="card-choices">
           <div class="card-choice" data-card="weather-card">
             <label><input type="checkbox" value="weather-card" checked> Weather Lizard</label>
@@ -115,7 +115,7 @@
             <p class="eyebrow weather-place" id="weather-place">Cincinnati, OH 45202</p>
             <div class="weather-reading" id="weather-reading" hidden>
               <strong id="weather-temperature"></strong>
-              <div><p id="weather-condition"></p><p class="reading-source" id="weather-source"></p></div>
+              <div><p id="weather-condition"></p><p class="reading-source" id="weather-source"></p><p id="weather-compact-precip"></p></div>
             </div>
             <p class="weather-status" id="weather-status" role="status">Loading forecast…</p>
           </div>

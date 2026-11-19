@@ -23,7 +23,7 @@ test('exports only audited keys and exactly preserves all ten app snapshots', ()
   const source = new Storage({ ...fixtures, unrelated: 'leave me alone', 'future-app.secret': 'private' });
   const data = backup(source);
   assert.equal(Object.keys(data.apps).length, 10);
-  assert.equal(Object.values(data.apps).flatMap(Object.keys).length, 15);
+  assert.equal(Object.values(data.apps).flatMap(Object.keys).length, 16);
   assert(!json(data).includes('leave me alone'));
   const destination = new Storage({ unrelated: 'untouched' });
   restoreBackup(destination, parseBackup(json(data)), Object.keys(data.apps));
