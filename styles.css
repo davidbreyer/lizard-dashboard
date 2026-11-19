@@ -50,7 +50,8 @@ html:has(.desk-mode[open]) { overflow: hidden; }
 .desk-layout { max-width: 90rem; min-height: 100%; margin: auto; padding: clamp(16px, 4vw, 64px); display: flex; flex-direction: column; }
 .desk-header { position: sticky; top: 0; z-index: 1; display: flex; align-items: center; justify-content: space-between; gap: 12px; background: #152d25; }
 .desk-header h2, .desk-details h3 { font-size: 1rem; font-weight: 600; color: #c3d9bc; }
-.desk-header button { min-height: 44px; border: 1px solid #829a89; border-radius: 24px; padding: 8px 16px; color: inherit; background: transparent; cursor: pointer; }
+.desk-header button { display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 0; border-radius: 50%; color: #c3d9bc; background: transparent; cursor: pointer; }
+.desk-header button:is(:hover, :focus-visible) { color: #f6f5e9; background: #294537; }
 .desk-header button:focus-visible { outline-color: #d9efa5; }
 .desk-display { flex: 1; display: grid; grid-template-columns: 1.35fr 1fr; align-content: center; align-items: center; gap: clamp(24px, 5vw, 80px); padding-block: 32px; }
 .desk-clock, .desk-details { min-width: 0; }
