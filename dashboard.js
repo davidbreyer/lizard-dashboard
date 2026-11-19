@@ -111,6 +111,7 @@ function selectCountdown() {
 
 function tick() {
   const now = new Date();
+  if (weatherLoadedAt && !document.hidden && !weatherCard.hidden) updateWeatherAge(now.getTime());
   const today = now.toDateString();
   if (today !== displayedDate) {
     displayedDate = today;
@@ -478,6 +479,7 @@ const daypartNodes = [...document.querySelectorAll('#dayparts li')].map((item) =
 const locationButton = byId('weather-location');
 const defaultButton = byId('weather-default');
 const refreshButton = byId('weather-refresh');
+const freshness = byId('weather-freshness');
 let activeLocation = readWeatherLocation() ?? defaultLocation;
 let weatherLoadedAt = 0;
 let weatherBusy = false;
@@ -624,6 +626,11 @@ async function updateWeather(mode = 'refresh') {
     renderWeather(properties, periods, location.label || placeName(properties), observation, alerts);
     activeLocation = location;
     weatherLoadedAt = Date.now();
+    const updated = new Date(weatherLoadedAt);
+    freshness.dateTime = updated.toISOString();
+    freshness.title = 'Forecast retrieved ' + updated.toLocaleString();
+    updateWeatherAge(weatherLoadedAt);
+    freshness.hidden = false;
     if (mode === 'locate') preferenceSaved = saveWeatherLocation(location);
     status.textContent = preferenceSaved ? '' : 'Could not save the location change in this browser.';
   } catch {
@@ -643,10 +650,26 @@ function refreshSavedWeather() {
   weatherBusy = locationButton.disabled = defaultButton.disabled = refreshButton.disabled = false;
   activeLocation = readWeatherLocation() ?? defaultLocation;
   weatherLoadedAt = 0;
+  freshness.hidden = true;
+  freshness.textContent = '';
   byId('weather-reading').hidden = true;
   byId('weather-alerts').hidden = true;
   byId('weather-place').textContent = activeLocation.label || 'Saved location';
   updateWeather();
+}
+
+function updateWeatherAge(now) {
+  const minutes = Math.max(0, Math.floor((now - weatherLoadedAt) / 60000));
+  let age = 'just now';
+  if (minutes >= 1) {
+    const hours = Math.floor(minutes / 60);
+    const days = Math.floor(hours / 24);
+    const value = days || hours || minutes;
+    const unit = days ? 'day' : hours ? 'hour' : 'minute';
+    age = value + ' ' + unit + (value === 1 ? '' : 's') + ' ago';
+  }
+  const label = 'Updated ' + age;
+  if (freshness.textContent !== label) freshness.textContent = label;
 }
 
 function refreshWeatherIfStale() {

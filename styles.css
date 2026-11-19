@@ -115,6 +115,8 @@ h1 { font-size: clamp(54px, 8.1vw, 108px); line-height: .93; }
 .weather { background: #f9fbff; border: 1px solid #c9d8eb; color: #061942; }
 .weather .widget-header { border-color: #c9d8eb; }
 .weather-header-actions { display: flex; flex-shrink: 0; align-items: center; gap: 10px; }
+.weather-forecast-link { text-align: end; }
+.weather-freshness { display: block; color: #52607b; font-size: .75rem; line-height: 1.4; font-variant-numeric: tabular-nums; }
 .weather-refresh { display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 1px solid #c9d8eb; border-radius: 50%; color: #1769e0; background: #ffffffcc; cursor: pointer; }
 .weather-refresh:hover:enabled { border-color: #1769e0; background: #fff; }
 .weather-refresh:disabled { opacity: .5; cursor: wait; }
